@@ -22,7 +22,7 @@ func newRouter(serv *Server) *Router {
 	}
 }
 
-func (router *Router) notFound(handler Handler) {
+func (router *Router) NotFound(handler Handler) {
 	router.notFoundHandler = handler
 }
 

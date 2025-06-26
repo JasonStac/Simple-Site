@@ -20,11 +20,11 @@ func (serv *Server) applyMiddleware(h Handler) Handler {
 	return chain(h, serv.middlewares...)
 }
 
-func (serv *Server) use(middleware ...Middleware) {
+func (serv *Server) Use(middleware ...Middleware) {
 	serv.middlewares = append(serv.middlewares, middleware...)
 }
 
-func loggingMiddleware(next Handler) Handler {
+func LoggingMiddleware(next Handler) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		println("Request:", r.Method, r.URL.Path)
 		next(w, r)
@@ -32,7 +32,7 @@ func loggingMiddleware(next Handler) Handler {
 	}
 }
 
-func authMiddleware(next Handler) Handler {
+func AuthMiddleware(next Handler) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//simple auth for now, update later
 		if r.Header.Get("Authorization") == "" {
@@ -43,7 +43,7 @@ func authMiddleware(next Handler) Handler {
 	}
 }
 
-func recoveryMiddleware(next Handler) Handler {
+func RecoveryMiddleware(next Handler) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
