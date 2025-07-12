@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"goserv/internal/db"
 	"goserv/internal/handlers"
 	"goserv/pkg/config"
@@ -10,7 +9,7 @@ import (
 	"net/http"
 )
 
-func run(ctx context.Context) error {
+func run() error {
 	cfg := config.Load()
 
 	conn, err := db.NewDB(cfg.DB)
@@ -27,11 +26,13 @@ func run(ctx context.Context) error {
 	mux := http.NewServeMux()
 	contentHandler := handlers.NewContentHandler(conn, tmplCache)
 	homeHandler := handlers.NewHomeHandler(tmplCache)
-	mux.HandleFunc("/", homeHandler.ServeHTTP)
 	mux.HandleFunc("/view", contentHandler.HandleViewContent)
 	mux.HandleFunc("/add", contentHandler.HandleAddContent)
 
+	mux.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./styles"))))
 	mux.Handle("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("./content"))))
+
+	mux.HandleFunc("/", homeHandler.HandleHome)
 
 	addr := ":" + cfg.Port
 	log.Printf("Starting server on %s...", addr)
@@ -40,8 +41,7 @@ func run(ctx context.Context) error {
 }
 
 func main() {
-	ctx := context.Background()
-	if err := run(ctx); err != nil {
+	if err := run(); err != nil {
 		log.Fatalf("Server exited with error: %v", err)
 	}
 }

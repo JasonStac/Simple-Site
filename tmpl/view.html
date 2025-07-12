@@ -1,19 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Starting for booru</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/styles/navigation-bar.css">
+  <style>
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .image-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+  </style>
+  <title>Starting for booru</title>
 </head>
 
 <body>
+  <div class="topnav">
+    <a href="/">Home</a>
+    <a class="active" href="/view">View</a>
+    <a href="/add">Add</a>
+    <a href="/tags">Tags</a>
+    <a href="/artists">Artists</a>
+  </div>
+
   <h1>Viewing Content</h1>
 
-  <p>[<a href="/add">add</a>]</p>
-
-  {{range .Paths}}
-    <div style="margin: 10px;">
-      <img src="/assets/images/{{.}}" alt="Image" style="max-width: 300px;">
-    </div>
-  {{end}}
+  <div class="image-grid">
+    {{range .Paths}}
+      <img src="/assets/images/{{.}}" alt="Image">
+    {{end}}
+  </div>
+  
 </body>
 </html>
