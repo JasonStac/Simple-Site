@@ -26,8 +26,11 @@ func run() error {
 	mux := http.NewServeMux()
 	contentHandler := handlers.NewContentHandler(conn, tmplCache)
 	homeHandler := handlers.NewHomeHandler(tmplCache)
+	userHandler := handlers.NewUserHandler(conn, tmplCache)
 	mux.HandleFunc("/view", contentHandler.HandleViewContent)
 	mux.HandleFunc("/add", contentHandler.HandleAddContent)
+	mux.HandleFunc("/register", userHandler.HandleRegister)
+	mux.HandleFunc("/login", userHandler.HandleLogin)
 
 	mux.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./styles"))))
 	mux.Handle("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("./content"))))

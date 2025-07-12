@@ -1,15 +1,16 @@
 CREATE TABLE IF NOT EXISTS Users (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(255) NOT NULL,
-  access_level INT NOT NULL -- 0 general user, 1 admin
+  username UNIQUE VARCHAR(255) NOT NULL,
+  pass_hash TEXT NOT NULL,
+  is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS Content (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
-  media_type INT NOT NULL, -- 0 image
+  media_type INT NOT NULL,
   file_name VARCHAR(255) NOT NULL,
-  artist VARCHAR(255) NULL
+  artist VARCHAR(255) NOT NULL DEFAULT ""
 );
 
 CREATE TABLE IF NOT EXISTS Tags (
@@ -17,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Tags (
 );
 
 CREATE TABLE IF NOT EXISTS PostTags (
-  post_id INT REFERENCES Content(id),
+  post_id INT REFERENCES Content(id) ON DELETE CASCADE,
   tag_name VARCHAR(255) REFERENCES Tags(tag_name)
 );
 
