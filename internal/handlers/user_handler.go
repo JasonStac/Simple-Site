@@ -22,7 +22,10 @@ func NewUserHandler(db *sql.DB, tmpl *template.Template) *UserHandler {
 func (h *UserHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		//TODO: display register page
+		err := h.tmpl.ExecuteTemplate(w, "register.html", nil)
+		if err != nil {
+			http.Error(w, "Template error", http.StatusInternalServerError)
+		}
 		return
 
 	case http.MethodPost:
@@ -54,7 +57,10 @@ func (h *UserHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		//TODO: display login page
+		err := h.tmpl.ExecuteTemplate(w, "login.html", nil)
+		if err != nil {
+			http.Error(w, "Template error", http.StatusInternalServerError)
+		}
 		return
 
 	case http.MethodPost:
