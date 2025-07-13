@@ -18,7 +18,7 @@ func NewContentDao(db *sql.DB) *ContentDao {
 }
 
 func (dao *ContentDao) AddContent(content *models.Content) error {
-	_, err := dao.db.Exec("INSERT INTO content (title, media_type, file_name, artist) VALUES ($1, $2, $3, $4)", content.Title, content.FileMedia, content.Filename, content.Artist)
+	_, err := dao.db.Exec("INSERT INTO content (title, media_type, file_name) VALUES ($1, $2, $3)", content.Title, content.FileMedia, content.Filename)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			if pqErr.Code == "23505" {

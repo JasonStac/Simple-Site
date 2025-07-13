@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -28,7 +27,11 @@ func NewContentHandler(db *sql.DB, tmpl *template.Template) *ContentHandler {
 func (h *ContentHandler) HandleAddContent(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		h.tmpl.ExecuteTemplate(w, "add.html", models.MediaTypes)
+		err := h.tmpl.ExecuteTemplate(w, "add.html", models.MediaTypes)
+		if err != nil {
+			http.Error(w, "Template error", http.StatusInternalServerError)
+			return
+		}
 
 	case http.MethodPost:
 		err := r.ParseMultipartForm(10 << 20)
@@ -38,13 +41,7 @@ func (h *ContentHandler) HandleAddContent(w http.ResponseWriter, r *http.Request
 		}
 
 		title := r.FormValue("title")
-		artist := r.FormValue("artist")
-		fileMedia, err := strconv.Atoi(r.FormValue("media"))
-		if err != nil {
-			http.Error(w, "Invalid form data", http.StatusBadRequest)
-			return
-		}
-
+		fileMedia := r.FormValue("media")
 		file, header, err := r.FormFile("file")
 		if err != nil {
 			http.Error(w, "Failed to get uploaded file", http.StatusBadRequest)
@@ -85,7 +82,7 @@ func (h *ContentHandler) HandleAddContent(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		content := &models.Content{Title: title, FileMedia: models.Media(fileMedia), Filename: finalName, Artist: artist}
+		content := &models.Content{Title: title, FileMedia: models.MediaType(fileMedia), Filename: finalName}
 		err = h.dao.AddContent(content)
 		if err != nil {
 			http.Error(w, "Failed to insert into DB", http.StatusInternalServerError)
@@ -114,7 +111,11 @@ func (h *ContentHandler) HandleViewContent(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	h.tmpl.ExecuteTemplate(w, "view.html", struct{ Paths []string }{
+	err = h.tmpl.ExecuteTemplate(w, "view.html", struct{ Paths []string }{
 		Paths: content,
 	})
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
 }

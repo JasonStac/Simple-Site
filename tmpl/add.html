@@ -27,13 +27,12 @@
     <div>Title: <textarea name="title" rows="1" cols="30"></textarea></div>
     <div>Type: 
       <select name="media">
-        {{range .}}
-          <option value="{{.Value}}">{{.Label}}</option>
+        {{range .MediaTypes}}
+          <option value="{{.}}">{{.}}</option>
         {{end}}
       </select>
     </div>
     <div>File: <input name="file" type="file"/></div>
-    <div>Artist: <textarea name="artist" rows="1" cols="30"></textarea></div>
     <br />
     <div><input type="submit" value="Save"></div>
   </form>

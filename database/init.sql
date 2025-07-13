@@ -1,33 +1,43 @@
+CREATE TYPE media_types AS ENUM ('Image', 'Video', 'Audio', 'Book');
+
 CREATE TABLE IF NOT EXISTS Users (
   id SERIAL PRIMARY KEY,
-  username UNIQUE VARCHAR(255) NOT NULL,
+  username TEXT UNIQUE NOT NULL,
   pass_hash TEXT NOT NULL,
   is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS Content (
   id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  media_type INT NOT NULL,
-  file_name VARCHAR(255) NOT NULL,
-  artist VARCHAR(255) NOT NULL DEFAULT ""
+  title TEXT NOT NULL,
+  media_type media_types NOT NULL,
+  file_name TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Tags (
-  tag_name VARCHAR(255) PRIMARY KEY
+  id SERIAL PRIMARY KEY,
+  tag_name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS PostTags (
   post_id INT REFERENCES Content(id) ON DELETE CASCADE,
-  tag_name VARCHAR(255) REFERENCES Tags(tag_name)
+  tag_id INT REFERENCES Tags(id) ON DELETE CASCADE,
+  PRIMARY KEY (post_id, tag_id)
 );
 
-INSERT INTO Tags VALUES ('fighting');
-INSERT INTO Tags VALUES ('walking');
-INSERT INTO Tags VALUES ('city');
-INSERT INTO Tags VALUES ('beach');
-INSERT INTO Tags VALUES ('forest');
-INSERT INTO Tags VALUES ('tattoo');
-INSERT INTO Tags VALUES ('rainy');
-INSERT INTO Tags VALUES ('night');
-INSERT INTO Tags VALUES ('sunny');
+CREATE INDEX IF NOT EXISTS idx_posttags_tag_id ON PostTags(tag_id);
+CREATE INDEX IF NOT EXISTS idx_posttags_post_id ON PostTags(post_id);
+
+CREATE TABLE IF NOT EXISTS Artists (
+  id SERIAL PRIMARY KEY,
+  artist_name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS ArtistPosts (
+  artist_id INT REFERENCES Artists(id) ON DELETE CASCADE,
+  post_id INT REFERENCES Content(id) ON DELETE CASCADE,
+  PRIMARY KEY (artist_id, post_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_artistposts_artist_id ON ArtistPosts(artist_id);
+CREATE INDEX IF NOT EXISTS idx_artistposts_post_id ON ArtistPosts(post_id);

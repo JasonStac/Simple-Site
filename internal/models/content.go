@@ -3,7 +3,6 @@ package models
 type Content struct {
 	ID        int
 	Title     string
-	FileMedia Media
+	FileMedia MediaType
 	Filename  string
-	Artist    string
 }
