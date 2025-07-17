@@ -33,3 +33,12 @@ func (dao *UserDao) GetUser(username string) (*models.User, error) {
 
 	return user, nil
 }
+
+func (dao *UserDao) SaveSession(username string, sessionID string) error {
+	_, err := dao.db.Exec("INSERT INTO sessions (username, session_id) VALUES ($1, $2) ON CONFLICT (username) DO UPDATE SET session_id = $2", username, sessionID)
+	if err != nil {
+		log.Printf("Error saving session: %v\n", err)
+	}
+
+	return err
+}

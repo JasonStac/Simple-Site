@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"goserv/internal/dao"
 	"goserv/internal/models"
+	"goserv/utils"
 	"html/template"
 	"net/http"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -80,7 +82,20 @@ func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//TODO: do session/token stuff for login tracking
+		sessionID := utils.GenerateSessionID()
+		err = h.dao.SaveSession(username, sessionID)
+		if err != nil {
+			http.Error(w, "Error saving session", http.StatusInternalServerError)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session",
+			Value:    sessionID,
+			Path:     "/",
+			HttpOnly: true,
+			Expires:  time.Now().Add(24 * time.Hour),
+		})
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 

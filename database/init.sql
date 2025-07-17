@@ -1,10 +1,15 @@
-CREATE TYPE media_types AS ENUM ('Image', 'Video', 'Audio', 'Book');
+CREATE TYPE IF NOT EXISTS media_types AS ENUM ('Image', 'Video', 'Audio', 'Book');
 
 CREATE TABLE IF NOT EXISTS Users (
   id SERIAL PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   pass_hash TEXT NOT NULL,
   is_admin BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS Sessions (
+  username TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Content (
