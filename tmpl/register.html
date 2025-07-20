@@ -9,15 +9,15 @@
   <h1>Register</h1>
 
   <form action="/register" method="Post" name="registerForm" id="registerForm">
-    <Label>Username: <input type="text" name="username" id="username"></Label><br>
-    <Label>Password: <input type="password" name="password" id="password"></Label><br>
-    <Label>Confirm Password: <input type="password" name="password2" id="password2"></Label><br>
+    <label>Username: <input type="text" name="username" id="username"></label><br>
+    <label>Password: <input type="password" name="password" id="password"></label><br>
+    <label>Confirm Password: <input type="password" name="password2" id="password2"></label><br>
     <button type="submit">Register</button>
   </form>
 
   <p id="error" style="color: red; font-weight: bold;"></p>
 
-  <Label>Already have an account? <a href="/login">Login</a> here!</Label>
+  <label>Already have an account? <a href="/login">Login</a> here!</label>
 
   <script>
     const form = document.getElementById("registerForm")
