@@ -16,8 +16,13 @@
       <a href="/artists">Artists</a>
     </div>
     <div class="right">
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
+      {{if .User}}
+        <a href="/logout">Logout</a>
+        <a href="/profile">Profile</a>
+      {{else}}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+      {{end}}
     </div>
   </div>
 
