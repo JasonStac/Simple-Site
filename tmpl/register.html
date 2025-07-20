@@ -8,10 +8,29 @@
 <body>
   <h1>Register</h1>
 
-  <form action="/register" method="Post">
-    <Label>Username: <input type="text" name="username"></Label><br>
-    <Label>Password: <input type="password" name="password"></Label><br>
+  <form action="/register" method="Post" name="registerForm" id="registerForm">
+    <Label>Username: <input type="text" name="username" id="username"></Label><br>
+    <Label>Password: <input type="password" name="password" id="password"></Label><br>
+    <Label>Confirm Password: <input type="password" name="password2" id="password2"></Label><br>
     <button type="submit">Register</button>
   </form>
+
+  <p id="error" style="color: red; font-weight: bold;"></p>
+
+  <Label>Already have an account? <a href="/login">Login</a> here!</Label>
+
+  <script>
+    const form = document.getElementById("registerForm")
+    const errorDisplay = document.getElementById("error");
+    form.addEventListener("submit", function (e) {
+      errorDisplay.textContent = "";
+      const password1 = document.getElementById("password").value;
+      const password2 = document.getElementById("password2").value;
+      if (password1 != password2) {
+        errorDisplay.textContent = "Passwords do not match";
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>
