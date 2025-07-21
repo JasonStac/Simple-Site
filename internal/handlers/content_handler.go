@@ -28,8 +28,7 @@ func handleAddContent(db *sql.DB, tmpl *template.Template) http.Handler {
 			}
 
 		case http.MethodPost:
-			err := r.ParseMultipartForm(10 << 20)
-			if err != nil {
+			if err := r.ParseMultipartForm(10 << 20); err != nil {
 				http.Error(w, "Invalid form data", http.StatusBadRequest)
 				return
 			}
@@ -78,15 +77,24 @@ func handleAddContent(db *sql.DB, tmpl *template.Template) http.Handler {
 				return
 			}
 
-			content := &models.Content{Title: title, FileMedia: models.MediaType(fileMedia), Filename: finalName}
-			err = dao.AddContent(db, content)
-			if err != nil {
+			user := utils.GetSessionUser(db, r)
+			if user == nil {
+				http.Error(w, "Failed to authenticate user", http.StatusInternalServerError)
+				return
+			}
+
+			content := &models.Content{
+				Title:     title,
+				FileMedia: models.MediaType(fileMedia),
+				Filename:  finalName,
+			}
+			if err := dao.AddPost(db, content, user.ID); err != nil {
 				http.Error(w, "Failed to insert into DB", http.StatusInternalServerError)
 				return
 			}
 
 			if err := os.Rename(tempFile.Name(), finalPath); err != nil {
-				_ = dao.DeleteContentByFilename(db, finalName)
+				_ = dao.DeletePostByFilename(db, finalName)
 				http.Error(w, "Failed to store file", http.StatusInternalServerError)
 				return
 			}
@@ -133,6 +141,30 @@ func handleViewUploads(db *sql.DB, tmpl *template.Template) http.Handler {
 		}
 
 		content, err := dao.GetUserContentFiles(db, cookie.Value)
+		if err != nil {
+			http.Error(w, "Database query failed", http.StatusInternalServerError)
+			return
+		}
+
+		err = tmpl.ExecuteTemplate(w, "uploads.html", struct{ Paths []string }{
+			Paths: content,
+		})
+		if err != nil {
+			http.Error(w, "Template error", http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+func handleViewFavourites(db *sql.DB, tmpl *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("id")
+		if err != nil {
+			http.Error(w, "Failed to read cookie", http.StatusBadRequest)
+			return
+		}
+
+		content, err := dao.GetUserFavContentFiles(db, cookie.Value)
 		if err != nil {
 			http.Error(w, "Database query failed", http.StatusInternalServerError)
 			return

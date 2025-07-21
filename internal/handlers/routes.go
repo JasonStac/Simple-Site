@@ -15,6 +15,7 @@ func AddRoutes(mux *http.ServeMux, db *sql.DB, tmpl *template.Template) {
 	mux.Handle("/profile", isUser(db, handleProfile(tmpl)))
 	mux.Handle("/add", isUser(db, handleAddContent(db, tmpl)))
 	mux.Handle("/uploads", isUser(db, handleViewUploads(db, tmpl)))
+	mux.Handle("/favourites", isUser(db, handleViewFavourites(db, tmpl)))
 
 	mux.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("./styles"))))
 	mux.Handle("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("./content"))))

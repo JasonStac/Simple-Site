@@ -12,18 +12,30 @@ CREATE TABLE IF NOT EXISTS Sessions (
   session_id TEXT UNIQUE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Content (
+CREATE TABLE IF NOT EXISTS Posts (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   media_type media_types NOT NULL,
-  file_name TEXT NOT NULL
+  filename TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS UserPosts (
   user_id INT REFERENCES Users(id) ON DELETE CASCADE,
-  post_id INT REFERENCES Content(id) ON DELETE CASCADE,
+  post_id INT REFERENCES Posts(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, post_id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_userposts_user_id ON UserPosts(user_id);
+CREATE INDEX IF NOT EXISTS idx_userposts_post_id ON UserPosts(post_id);
+
+CREATE TABLE IF NOT EXISTS UserFavs (
+  user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+  post_id INT REFERENCES Posts(id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, post_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_userfavs_user_id ON UserFavs(user_id);
+CREATE INDEX IF NOT EXISTS idx_userfavs_post_id ON UserFavs(post_id);
 
 CREATE TABLE IF NOT EXISTS Tags (
   id SERIAL PRIMARY KEY,
@@ -31,7 +43,7 @@ CREATE TABLE IF NOT EXISTS Tags (
 );
 
 CREATE TABLE IF NOT EXISTS PostTags (
-  post_id INT REFERENCES Content(id) ON DELETE CASCADE,
+  post_id INT REFERENCES Posts(id) ON DELETE CASCADE,
   tag_id INT REFERENCES Tags(id) ON DELETE CASCADE,
   PRIMARY KEY (post_id, tag_id)
 );
@@ -46,7 +58,7 @@ CREATE TABLE IF NOT EXISTS Artists (
 
 CREATE TABLE IF NOT EXISTS ArtistPosts (
   artist_id INT REFERENCES Artists(id) ON DELETE CASCADE,
-  post_id INT REFERENCES Content(id) ON DELETE CASCADE,
+  post_id INT REFERENCES Posts(id) ON DELETE CASCADE,
   PRIMARY KEY (artist_id, post_id)
 );
 

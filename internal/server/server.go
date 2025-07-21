@@ -13,7 +13,5 @@ func NewServer(db *sql.DB, tmpl *template.Template) http.Handler {
 
 	var handler http.Handler = mux
 
-	// put global middleware on handler
-
 	return handler
 }

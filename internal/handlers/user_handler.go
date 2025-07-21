@@ -37,8 +37,7 @@ func handleRegister(db *sql.DB, tmpl *template.Template) http.Handler {
 			}
 
 			user := &models.User{Username: username, PassHash: string(hashedPass)}
-			err = dao.AddUser(db, user)
-			if err != nil {
+			if err := dao.AddUser(db, user); err != nil {
 				http.Error(w, "Error creating user", http.StatusInternalServerError)
 				return
 			}
@@ -84,8 +83,7 @@ func handleLogin(db *sql.DB, tmpl *template.Template) http.Handler {
 			}
 
 			sessionID := utils.GenerateSessionID()
-			err = dao.SaveSession(db, username, sessionID)
-			if err != nil {
+			if err := dao.SaveSession(db, username, sessionID); err != nil {
 				http.Error(w, "Error saving session", http.StatusInternalServerError)
 				return
 			}
@@ -118,8 +116,7 @@ func handleLogout(db *sql.DB, tmpl *template.Template) http.Handler {
 			}
 
 		case http.MethodPost:
-			confirmation := r.FormValue("yes")
-			if confirmation == "" {
+			if confirmation := r.FormValue("yes"); confirmation == "" {
 				http.Redirect(w, r, "/", http.StatusSeeOther)
 				return
 			}
@@ -136,8 +133,7 @@ func handleLogout(db *sql.DB, tmpl *template.Template) http.Handler {
 				return
 			}
 
-			err = dao.DeleteSession(db, username)
-			if err != nil {
+			if err := dao.DeleteSession(db, username); err != nil {
 				http.Error(w, "Failed to delete session", http.StatusInternalServerError)
 				return
 			}
@@ -156,8 +152,7 @@ func handleLogout(db *sql.DB, tmpl *template.Template) http.Handler {
 
 func handleProfile(tmpl *template.Template) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := tmpl.ExecuteTemplate(w, "profile.html", nil)
-		if err != nil {
+		if err := tmpl.ExecuteTemplate(w, "profile.html", nil); err != nil {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
