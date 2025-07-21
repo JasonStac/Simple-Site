@@ -50,3 +50,28 @@ func GetContentFiles(db *sql.DB) ([]string, error) {
 	}
 	return files, nil
 }
+
+func GetUserContentFiles(db *sql.DB, sessionID string) ([]string, error) {
+	rows, err := db.Query(
+		"SELECT c.file_name FROM sessions s"+
+			" Join users u ON s.username = u.username"+
+			" JOIN userposts up ON u.id = up.user_id"+
+			" JOIN content c ON up.post_id = c.id"+
+			" WHERE s.session_id = $1", sessionID)
+	if err != nil {
+		log.Printf("Error with database query: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	files := []string{}
+	for rows.Next() {
+		var file string
+		rows.Scan(&file)
+
+		filePath := path.Join(file[0:2], file[2:4], file)
+
+		files = append(files, filePath)
+	}
+	return files, nil
+}

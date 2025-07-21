@@ -57,22 +57,17 @@
   <div class="topnav">
     <div class="left">
       <a href="/">Home</a>
-      <a class="active" href="/view">View</a>
+      <a href="/view">View</a>
       <a href="/tags">Tags</a>
       <a href="/artists">Artists</a>
     </div>
     <div class="right">
-      {{if .User}}
-        <a href="/logout">Logout</a>
-        <a href="/profile">Profile</a>
-      {{else}}
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-      {{end}}
+      <a href="/logout">Logout</a>
+      <a href="/profile">Profile</a>
     </div>
   </div>
 
-  <h1 style="color: white;">Viewing Content</h1>
+  <h1 style="color: white;">Viewing Uploads</h1>
 
   <div class="image-grid">
     {{range .Paths}}

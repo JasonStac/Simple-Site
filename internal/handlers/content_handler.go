@@ -123,3 +123,27 @@ func handleViewContent(db *sql.DB, tmpl *template.Template) http.Handler {
 		}
 	})
 }
+
+func handleViewUploads(db *sql.DB, tmpl *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("id")
+		if err != nil {
+			http.Error(w, "Failed to read cookie", http.StatusBadRequest)
+			return
+		}
+
+		content, err := dao.GetUserContentFiles(db, cookie.Value)
+		if err != nil {
+			http.Error(w, "Database query failed", http.StatusInternalServerError)
+			return
+		}
+
+		err = tmpl.ExecuteTemplate(w, "uploads.html", struct{ Paths []string }{
+			Paths: content,
+		})
+		if err != nil {
+			http.Error(w, "Template error", http.StatusInternalServerError)
+			return
+		}
+	})
+}

@@ -6,25 +6,25 @@
   <title>Starting for booru</title>
 </head>
 
+
 <body>
   <div class="topnav">
     <div class="left">
-      <a class="active" href="/">Home</a>
+      <a href="/">Home</a>
       <a href="/view">View</a>
       <a href="/tags">Tags</a>
       <a href="/artists">Artists</a>
     </div>
     <div class="right">
-      {{if .User}}
-        <a href="/logout">Logout</a>
-        <a href="/profile">Profile</a>
-      {{else}}
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-      {{end}}
+      <a href="/logout">Logout</a>
+      <a class="active" href="/profile">Profile</a>
     </div>
   </div>
 
-  <h1>Home Page</h1>
+  <h1>Profile</h1>
+
+  <a href="/add">Add content</a><br>
+  <a href="/uploads">View uploads</a><br>
+  <a href="/favourites">View favourites</a><br>
 </body>
 </html>
