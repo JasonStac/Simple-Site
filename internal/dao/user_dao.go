@@ -40,7 +40,7 @@ func GetSessionUsername(db *sql.DB, sessionID string) (string, error) {
 	err := db.QueryRow("SELECT username FROM Sessions"+
 		" WHERE session_id = $1", sessionID).Scan(&username)
 	if err != nil {
-		log.Printf("Error getting uesr: %v\n", err)
+		log.Printf("Error getting user: %v\n", err)
 		return "", err
 	}
 	return username, nil
