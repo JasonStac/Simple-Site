@@ -9,7 +9,7 @@ import (
 
 func AddPost(db *sql.DB, content *models.Content, userID int) error {
 	var postID int
-	err := db.QueryRow("INSERT INTO Posts (title, media_type, file_name)"+
+	err := db.QueryRow("INSERT INTO Posts (title, media_type, filename)"+
 		" VALUES ($1, $2, $3) RETURNING id",
 		content.Title, content.FileMedia, content.Filename).Scan(&postID)
 	if err != nil {
