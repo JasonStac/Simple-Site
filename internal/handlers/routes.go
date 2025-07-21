@@ -8,6 +8,8 @@ import (
 
 func AddRoutes(mux *http.ServeMux, db *sql.DB, tmpl *template.Template) {
 	mux.Handle("/view", handleViewContent(db, tmpl))
+	mux.Handle("/tags", handleViewTags(db, tmpl))
+	mux.Handle("/artists", handleViewArtists(db, tmpl))
 	mux.Handle("/register", handleRegister(db, tmpl))
 	mux.Handle("/login", handleLogin(db, tmpl))
 	mux.Handle("/logout", isUser(db, handleLogout(db, tmpl)))

@@ -108,3 +108,37 @@ func GetUserFavContentFiles(db *sql.DB, sessionID string) ([]string, error) {
 	}
 	return files, nil
 }
+
+func GetTags(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SELECT name FROM Tags")
+	if err != nil {
+		log.Printf("Failed to get tags: %v\n", err)
+		return nil, err
+	}
+
+	tags := []string{}
+	for rows.Next() {
+		var tag string
+		rows.Scan(&tag)
+
+		tags = append(tags, tag)
+	}
+	return tags, nil
+}
+
+func GetArtists(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SELECT name FROM Artists")
+	if err != nil {
+		log.Printf("Failed to get artists: %v\n", err)
+		return nil, err
+	}
+
+	artists := []string{}
+	for rows.Next() {
+		var artist string
+		rows.Scan(&artist)
+
+		artists = append(artists, artist)
+	}
+	return artists, nil
+}

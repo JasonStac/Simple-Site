@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/styles/navigation-bar.css">
+  <title>Starting for booru</title>
+</head>
+<body>
+  <div class="topnav">
+    <div class="left">
+      <a href="/">Home</a>
+      <a href="/view">View</a>
+      <a class="active" href="/tags">Tags</a>
+      <a href="/artists">Artists</a>
+    </div>
+    <div class="right">
+      {{if .User}}
+        <a href="/logout">Logout</a>
+        <a href="/profile">Profile</a>
+      {{else}}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+      {{end}}
+    </div>
+  </div>
+
+  <h1>Tags</h1>
+
+  <div>
+    {{range .Tags}}
+      <p>{{.}}</p>
+    {{end}}
+  </div>
+</body>

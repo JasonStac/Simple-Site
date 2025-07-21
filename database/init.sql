@@ -39,7 +39,7 @@ CREATE INDEX IF NOT EXISTS idx_userfavs_post_id ON UserFavs(post_id);
 
 CREATE TABLE IF NOT EXISTS Tags (
   id SERIAL PRIMARY KEY,
-  tag_name TEXT NOT NULL UNIQUE
+  name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS PostTags (
@@ -53,7 +53,7 @@ CREATE INDEX IF NOT EXISTS idx_posttags_post_id ON PostTags(post_id);
 
 CREATE TABLE IF NOT EXISTS Artists (
   id SERIAL PRIMARY KEY,
-  artist_name TEXT NOT NULL UNIQUE
+  name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS ArtistPosts (

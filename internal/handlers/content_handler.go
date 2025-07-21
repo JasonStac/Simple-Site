@@ -179,3 +179,49 @@ func handleViewFavourites(db *sql.DB, tmpl *template.Template) http.Handler {
 		}
 	})
 }
+
+func handleViewArtists(db *sql.DB, tmpl *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		artists, err := dao.GetArtists(db)
+		if err != nil {
+			http.Error(w, "Database query failed", http.StatusInternalServerError)
+			return
+		}
+
+		user := utils.GetSessionUser(db, r)
+		err = tmpl.ExecuteTemplate(w, "artists.html", struct {
+			Artists []string
+			User    *models.User
+		}{
+			Artists: artists,
+			User:    user,
+		})
+		if err != nil {
+			http.Error(w, "Template error", http.StatusInternalServerError)
+			return
+		}
+	})
+}
+
+func handleViewTags(db *sql.DB, tmpl *template.Template) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tags, err := dao.GetTags(db)
+		if err != nil {
+			http.Error(w, "Database query failed", http.StatusInternalServerError)
+			return
+		}
+
+		user := utils.GetSessionUser(db, r)
+		err = tmpl.ExecuteTemplate(w, "tags.html", struct {
+			Tags []string
+			User *models.User
+		}{
+			Tags: tags,
+			User: user,
+		})
+		if err != nil {
+			http.Error(w, "Template error", http.StatusInternalServerError)
+			return
+		}
+	})
+}
