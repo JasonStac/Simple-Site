@@ -61,7 +61,7 @@ func GetContentFiles(db *sql.DB) ([]string, error) {
 
 func GetUserContentFiles(db *sql.DB, sessionID string) ([]string, error) {
 	rows, err := db.Query(
-		"SELECT c.file_name FROM Sessions s"+
+		"SELECT p.filename FROM Sessions s"+
 			" Join Users u ON s.username = u.username"+
 			" JOIN UserPosts up ON u.id = up.user_id"+
 			" JOIN Posts p ON up.post_id = p.id"+
@@ -86,7 +86,7 @@ func GetUserContentFiles(db *sql.DB, sessionID string) ([]string, error) {
 
 func GetUserFavContentFiles(db *sql.DB, sessionID string) ([]string, error) {
 	rows, err := db.Query(
-		"SELECT c.file_name FROM Sessions s"+
+		"SELECT p.filename FROM Sessions s"+
 			" Join Users u ON s.username = u.username"+
 			" JOIN UserFavs uf ON u.id = uf.user_id"+
 			" JOIN Posts p ON uf.post_id = p.id"+
