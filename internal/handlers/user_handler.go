@@ -12,8 +12,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func handleRegister(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleRegister(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			user := utils.GetSessionUser(db, r)
@@ -48,11 +48,11 @@ func handleRegister(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Unsupported Method Request", http.StatusMethodNotAllowed)
 			return
 		}
-	})
+	}
 }
 
-func handleLogin(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleLogin(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			user := utils.GetSessionUser(db, r)
@@ -102,11 +102,11 @@ func handleLogin(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Unsupported Method Request", http.StatusMethodNotAllowed)
 			return
 		}
-	})
+	}
 }
 
-func handleLogout(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleLogout(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			err := tmpl.ExecuteTemplate(w, "logout.html", nil)
@@ -147,14 +147,14 @@ func handleLogout(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Unsupported Method Request", http.StatusMethodNotAllowed)
 			return
 		}
-	})
+	}
 }
 
-func handleProfile(tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleProfile(tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if err := tmpl.ExecuteTemplate(w, "profile.html", nil); err != nil {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
-	})
+	}
 }

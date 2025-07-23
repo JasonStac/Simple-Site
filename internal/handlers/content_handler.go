@@ -15,8 +15,8 @@ import (
 	"strings"
 )
 
-func handleAddContent(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleAddContent(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			err := tmpl.ExecuteTemplate(w, "add.html", struct{ MediaTypes []models.MediaType }{
@@ -105,12 +105,12 @@ func handleAddContent(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Unsupported Method Request", http.StatusMethodNotAllowed)
 			return
 		}
-	})
+	}
 }
 
 // TODO: add filtered viewing
-func handleViewContent(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleViewContent(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		content, err := dao.GetContentFiles(db)
 		if err != nil {
 			http.Error(w, "Database query failed", http.StatusInternalServerError)
@@ -129,11 +129,11 @@ func handleViewContent(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
-	})
+	}
 }
 
-func handleViewUploads(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleViewUploads(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("id")
 		if err != nil {
 			http.Error(w, "Failed to read cookie", http.StatusBadRequest)
@@ -153,11 +153,11 @@ func handleViewUploads(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
-	})
+	}
 }
 
-func handleViewFavourites(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleViewFavourites(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("id")
 		if err != nil {
 			http.Error(w, "Failed to read cookie", http.StatusBadRequest)
@@ -177,11 +177,11 @@ func handleViewFavourites(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
-	})
+	}
 }
 
-func handleViewArtists(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleViewArtists(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		artists, err := dao.GetArtists(db)
 		if err != nil {
 			http.Error(w, "Database query failed", http.StatusInternalServerError)
@@ -200,11 +200,11 @@ func handleViewArtists(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
-	})
+	}
 }
 
-func handleViewTags(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleViewTags(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		tags, err := dao.GetTags(db)
 		if err != nil {
 			http.Error(w, "Database query failed", http.StatusInternalServerError)
@@ -223,5 +223,5 @@ func handleViewTags(db *sql.DB, tmpl *template.Template) http.Handler {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
-	})
+	}
 }

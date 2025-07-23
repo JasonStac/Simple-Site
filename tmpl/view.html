@@ -57,14 +57,14 @@
   <div class="topnav">
     <div class="left">
       <a href="/">Home</a>
-      <a class="active" href="/view">View</a>
-      <a href="/tags">Tags</a>
-      <a href="/artists">Artists</a>
+      <a class="active" href="/view/posts">View</a>
+      <a href="/view/tags">Tags</a>
+      <a href="/view/artists">Artists</a>
     </div>
     <div class="right">
       {{if .User}}
         <a href="/logout">Logout</a>
-        <a href="/profile">Profile</a>
+        <a href="/profile/{{.User.Username}}/">Profile</a>
       {{else}}
         <a href="/login">Login</a>
         <a href="/register">Register</a>

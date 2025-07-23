@@ -10,9 +10,9 @@
   <div class="topnav">
     <div class="left">
       <a href="/">Home</a>
-      <a href="/view">View</a>
-      <a href="/tags">Tags</a>
-      <a href="/artists">Artists</a>
+      <a href="/view/posts">View</a>
+      <a href="/view/tags">Tags</a>
+      <a href="/view/artists">Artists</a>
     </div>
     <div class="right">
       <a href="/logout">Logout</a>
@@ -22,7 +22,7 @@
 
   <h1>Adding Content</h1>
 
-  <form action="/add" method="POST" enctype="multipart/form-data">
+  <form action="/profile/post" method="POST" enctype="multipart/form-data">
     <div>Title: <textarea name="title" rows="1" cols="30"></textarea></div>
     <div>Type: 
       <select name="media">

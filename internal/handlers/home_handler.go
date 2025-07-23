@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-func handleHome(db *sql.DB, tmpl *template.Template) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func handleHome(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
@@ -22,5 +22,5 @@ func handleHome(db *sql.DB, tmpl *template.Template) http.Handler {
 		if err != nil {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 		}
-	})
+	}
 }

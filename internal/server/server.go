@@ -5,13 +5,16 @@ import (
 	"goserv/internal/handlers"
 	"html/template"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func NewServer(db *sql.DB, tmpl *template.Template) http.Handler {
-	mux := http.NewServeMux()
-	handlers.AddRoutes(mux, db, tmpl)
+	router := chi.NewRouter()
 
-	var handler http.Handler = mux
+	// apply global middleware
 
-	return handler
+	handlers.AddRoutes(router, db, tmpl)
+
+	return router
 }
