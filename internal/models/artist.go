@@ -1,8 +1,8 @@
 package models
 
-type Tag struct {
+type Artist struct {
 	ID   uint   `gorm:"primaryKey"`
 	Name string `gorm:"uniqueIndex;not null"`
 
-	Posts []PostTag
+	Posts []PostArtist
 }
