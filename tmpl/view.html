@@ -62,7 +62,7 @@
       <a href="/view/artists">Artists</a>
     </div>
     <div class="right">
-      {{if .User}}
+      {{if .IsUser}}
         <a href="/logout">Logout</a>
         <a href="/profile">Profile</a>
       {{else}}
@@ -75,8 +75,10 @@
   <h1 style="color: white;">Viewing Content</h1>
 
   <div class="image-grid">
-    {{range .Paths}}
-      <img src="/assets/images/{{.}}" alt="Image">
+    {{range .Posts}}
+      <a href="/view/posts/{{.ID}}">
+        <img src="/assets/images/{{.Path}}" alt="Image">
+      </a>
     {{end}}
   </div>
   

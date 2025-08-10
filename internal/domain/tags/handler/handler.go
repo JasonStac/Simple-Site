@@ -2,7 +2,6 @@ package handler
 
 import (
 	"goserv/internal/domain/tags/service"
-	"goserv/internal/domain/users"
 	"goserv/internal/middleware"
 	"html/template"
 	"net/http"
@@ -30,20 +29,18 @@ func (h *TagHandler) ListTags(w http.ResponseWriter, r *http.Request) {
 		response = append(response, name)
 	}
 
-	var user *users.User
+	isUser := false
 	userID, ok := middleware.GetUserID(r)
-	if !ok || userID == -1 {
-		user = nil
-	} else {
-		user = &users.User{}
+	if ok && userID != -1 {
+		isUser = true
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "tags.html", struct {
-		Tags []string
-		User *users.User
+		Tags   []string
+		IsUser bool
 	}{
-		Tags: response,
-		User: user,
+		Tags:   response,
+		IsUser: isUser,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)

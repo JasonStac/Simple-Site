@@ -70,8 +70,10 @@
   <h1 style="color: white;">Profile View</h1>
 
   <div class="image-grid">
-    {{range .Paths}}
-      <img src="/assets/images/{{.}}" alt="Image">
+    {{range .Posts}}
+      <a href="/view/posts/{{.ID}}">
+        <img src="/assets/images/{{.Path}}" alt="Image">
+      </a>
     {{end}}
   </div>
   

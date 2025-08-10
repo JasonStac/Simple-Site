@@ -2,7 +2,6 @@ package handler
 
 import (
 	"goserv/internal/domain/artists/service"
-	"goserv/internal/domain/users"
 	"goserv/internal/middleware"
 	"html/template"
 	"net/http"
@@ -30,20 +29,18 @@ func (h *ArtistHandler) ListArtists(w http.ResponseWriter, r *http.Request) {
 		response = append(response, name)
 	}
 
-	var user *users.User
+	isUser := false
 	username, ok := middleware.GetUserID(r)
-	if !ok || username == -1 {
-		user = nil
-	} else {
-		user = &users.User{}
+	if ok && username != -1 {
+		isUser = true
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "artists.html", struct {
 		Artists []string
-		User    *users.User
+		IsUser  bool
 	}{
 		Artists: response,
-		User:    user,
+		IsUser:  isUser,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)

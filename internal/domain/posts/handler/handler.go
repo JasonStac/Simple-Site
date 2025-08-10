@@ -3,13 +3,17 @@ package handler
 import (
 	"goserv/internal/domain/posts"
 	"goserv/internal/domain/posts/service"
-	"goserv/internal/domain/users"
 	"goserv/internal/middleware"
 	"goserv/internal/models"
 	"html/template"
 	"net/http"
 	"path"
 )
+
+type ResponseEntry struct {
+	Path string
+	ID   int
+}
 
 type PostHandler struct {
 	svc  *service.PostService
@@ -68,26 +72,24 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []string
+	var responses []ResponseEntry
 	for _, post := range posts {
 		path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
-		response = append(response, path)
+		responses = append(responses, ResponseEntry{Path: path, ID: post.ID})
 	}
 
-	var user *users.User
+	isUser := false
 	userID, ok := middleware.GetUserID(r)
-	if !ok || userID == -1 {
-		user = nil
-	} else {
-		user = &users.User{}
+	if ok && userID != -1 {
+		isUser = true
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "view.html", struct {
-		Paths []string
-		User  *users.User
+		Posts  []ResponseEntry
+		IsUser bool
 	}{
-		Paths: response,
-		User:  user,
+		Posts:  responses,
+		IsUser: isUser,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -107,14 +109,14 @@ func (h *PostHandler) ListUserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []string
+	var responses []ResponseEntry
 	for _, post := range posts {
 		path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
-		response = append(response, path)
+		responses = append(responses, ResponseEntry{Path: path, ID: post.ID})
 	}
 
-	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Paths []string }{
-		Paths: response,
+	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Posts []ResponseEntry }{
+		Posts: responses,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -134,14 +136,14 @@ func (h *PostHandler) ListUserFavs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []string
+	var responses []ResponseEntry
 	for _, post := range posts {
 		path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
-		response = append(response, path)
+		responses = append(responses, ResponseEntry{Path: path, ID: post.ID})
 	}
 
-	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Paths []string }{
-		Paths: response,
+	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Posts []ResponseEntry }{
+		Posts: responses,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
