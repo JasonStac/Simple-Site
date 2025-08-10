@@ -23,6 +23,23 @@ func (s *Server) initRoutes(
 	authMiddleware := middleware.AuthRestrictMiddleware(s.session)
 	checkMiddleware := middleware.AuthCheckMiddleware(s.session)
 
+	s.router.With(checkMiddleware).Get("/",
+		func(w http.ResponseWriter, r *http.Request) {
+			isUser := false
+			userID, ok := middleware.GetUserID(r)
+			if ok && userID != -1 {
+				isUser = true
+			}
+
+			err := s.tmplCache.ExecuteTemplate(w, "home.html", struct{ User bool }{
+				User: isUser,
+			})
+			if err != nil {
+				http.Error(w, "Template error", http.StatusInternalServerError)
+			}
+		},
+	)
+
 	s.router.With(checkMiddleware).Get("/register", userHandler.DisplayRegister)
 	s.router.With(checkMiddleware).Post("/register", userHandler.Register)
 	s.router.With(checkMiddleware).Get("/login", sessionHandler.DisplayLogin)
