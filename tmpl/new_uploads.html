@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/styles/navigation-bar.css">
+  <style>
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px 5px;
+      margin: 0px 140px 0px 140px;
+      padding: 20px 25px;
+      background-color: darkgray;
+    }
+
+    .image-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    @media (max-width: 1319px) {
+      .image-grid {
+        margin: 0px 0px 0px 0px;
+      }
+    }
+
+    @media (max-width: 1269px) {
+      .image-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 1014px) {
+      .image-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 759px) {
+      .image-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 504px) {
+      .image-grid {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+  </style>
+  <title>Starting for booru</title>
+</head>
+
+<body style="background-color: black;">
+  <h1 style="color: white;">Profile View</h1>
+
+  <div style="text-align: center;">
+    <input type="text" id="searchInput" placeholder="Search by title...">
+    <button onclick="loadPosts(1)">Search</button>
+  </div>
+
+  <div class="image-grid" id="imageGrid"></div>
+
+  <div style="text-align: center; margin: 20px;" id="pagination"></div>
+
+  <script>
+    let currentPage = 1;
+
+    function loadPosts(page) {
+      const query = document.getElementById('searchInput').value;
+      fetch(`/api/uploads?page=${page}&query=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          currentPage = data.page;
+          renderImages(data.posts);
+          renderPagination(data.page, data.total_pages);
+        });
+    }
+
+    function renderImages(posts) {
+      const grid = document.getElementById('imageGrid');
+      grid.innerHTML = '';
+      posts.forEach(post => {
+        const img = document.createElement('img');
+        img.src = `/assets/images/${post.filename}`;
+        img.alt = post.title;
+        grid.appendChild(img);
+      });
+    }
+
+    function renderPagination(current, total) {
+      const container = document.getElementById('pagination');
+      container.innerHTML = '';
+
+      for (let i = 1; i <= total; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.disabled = (i === current);
+        btn.onclick = () => loadPosts(i);
+        container.appendChild(btn);
+      }
+    }
+
+    window.onload = () => loadPosts(1);
+  </script>
+</body>
+</html>

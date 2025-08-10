@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"goserv/internal/domain/posts"
 	"goserv/internal/domain/posts/service"
 	"goserv/internal/middleware"
 	"goserv/internal/models"
+	"goserv/internal/utils"
+	myErrors "goserv/internal/utils/errors"
 	"html/template"
 	"net/http"
 	"path"
@@ -84,11 +87,49 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 		isUser = true
 	}
 
-	err = h.tmpl.ExecuteTemplate(w, "view.html", struct {
+	err = h.tmpl.ExecuteTemplate(w, "list.html", struct {
 		Posts  []ResponseEntry
 		IsUser bool
 	}{
 		Posts:  responses,
+		IsUser: isUser,
+	})
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
+	postID, err := utils.GetPostIDFromPath(r.URL.Path)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	post, err := h.svc.GetPost(r.Context(), postID)
+	if err != nil {
+		if errors.Is(err, myErrors.ErrNotFound) {
+			http.NotFound(w, r)
+			return
+		}
+		http.Error(w, "Error getting post", http.StatusInternalServerError)
+		return
+	}
+
+	path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
+
+	userID, ok := middleware.GetUserID(r)
+	isUser := false
+	if !ok && userID != -1 {
+		isUser = true
+	}
+
+	err = h.tmpl.ExecuteTemplate(w, "view.html", struct {
+		Path   string
+		IsUser bool
+	}{
+		Path:   path,
 		IsUser: isUser,
 	})
 	if err != nil {

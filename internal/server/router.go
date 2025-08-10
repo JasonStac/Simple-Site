@@ -31,11 +31,12 @@ func (s *Server) initRoutes(
 				isUser = true
 			}
 
-			err := s.tmplCache.ExecuteTemplate(w, "home.html", struct{ User bool }{
-				User: isUser,
+			err := s.tmplCache.ExecuteTemplate(w, "home.html", struct{ IsUser bool }{
+				IsUser: isUser,
 			})
 			if err != nil {
 				http.Error(w, "Template error", http.StatusInternalServerError)
+				return
 			}
 		},
 	)
@@ -49,6 +50,7 @@ func (s *Server) initRoutes(
 
 	s.router.With(checkMiddleware).Route("/view", func(r chi.Router) {
 		r.Get("/posts", postHandler.ListPosts)
+		r.Mount("/posts/", http.HandlerFunc(postHandler.ViewPost))
 		r.Get("/tags", tagHandler.ListTags)
 		r.Get("/artists", artistHandler.ListArtists)
 	})

@@ -68,6 +68,10 @@ func (s *PostService) AddPost(ctx context.Context, post *posts.Post, content mul
 	return nil
 }
 
+func (s *PostService) GetPost(ctx context.Context, postID int) (*posts.Post, error) {
+	return s.repo.GetPost(ctx, postID)
+}
+
 func (s *PostService) ListPosts(ctx context.Context) ([]posts.Post, error) {
 	return s.repo.ListPosts(ctx)
 }

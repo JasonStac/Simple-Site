@@ -7,11 +7,13 @@ import (
 	"goserv/ent/gen/user"
 	"goserv/internal/domain/posts"
 	"goserv/internal/models"
+	"goserv/internal/utils/errors"
 )
 
 type Post interface {
 	AddPost(ctx context.Context, post *posts.Post, userID int) (int, error)
 	DeletePost(ctx context.Context, postID int) error
+	GetPost(ctx context.Context, postID int) (*posts.Post, error)
 	ListPosts(ctx context.Context) ([]posts.Post, error)
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
 	ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error)
@@ -36,6 +38,23 @@ func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userI
 func (repo *postRepository) DeletePost(ctx context.Context, postID int) error {
 	_, err := repo.client.Post.Delete().Where(entPost.IDEQ(postID)).Exec(ctx)
 	return err
+}
+
+func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Post, error) {
+	post, err := repo.client.Post.Query().Where(entPost.IDEQ(postID)).First(ctx)
+	if err != nil {
+		if gen.IsNotFound(err) {
+			return nil, errors.ErrNotFound
+		}
+		return nil, err
+	}
+	result := &posts.Post{
+		ID:        post.ID,
+		Title:     post.Title,
+		MediaType: models.MediaType(post.MediaType),
+		Filename:  post.Filename,
+	}
+	return result, nil
 }
 
 func (repo *postRepository) ListPosts(ctx context.Context) ([]posts.Post, error) {

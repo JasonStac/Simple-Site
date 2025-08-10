@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/styles/navigation-bar.css">
+  <style>
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px 5px;
+      margin: 0px 140px 0px 140px;
+      padding: 20px 25px;
+      background-color: darkgray;
+    }
+
+    .image-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    @media (max-width: 1319px) {
+      .image-grid {
+        margin: 0px 0px 0px 0px;
+      }
+    }
+
+    @media (max-width: 1269px) {
+      .image-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 1014px) {
+      .image-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 759px) {
+      .image-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 504px) {
+      .image-grid {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+  </style>
+  <title>Starting for booru</title>
+</head>
+
+<body style="background-color: black;">
+  <div class="topnav">
+    <div class="left">
+      <a href="/">Home</a>
+      <a class="active" href="/view/posts">View</a>
+      <a href="/view/tags">Tags</a>
+      <a href="/view/artists">Artists</a>
+    </div>
+    <div class="right">
+      {{if .IsUser}}
+        <a href="/logout">Logout</a>
+        <a href="/profile">Profile</a>
+      {{else}}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+      {{end}}
+    </div>
+  </div>
+
+  <h1 style="color: white;">Viewing Content</h1>
+
+  <div class="image-grid">
+    {{range .Posts}}
+      <a href="/view/posts/{{.ID}}">
+        <img src="/assets/images/{{.Path}}" alt="Image">
+      </a>
+    {{end}}
+  </div>
+  
+</body>
+</html>
