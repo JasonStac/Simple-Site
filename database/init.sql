@@ -58,10 +58,8 @@ CREATE TABLE "sessions" (
   "id" character varying NOT NULL,
   "user_id" bigint NOT NULL,
   PRIMARY KEY ("id"),
-  CONSTRAINT "sessions_users_session" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE NO ACTION
+  CONSTRAINT "sessions_users_session" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE
 );
-
-CREATE UNIQUE INDEX "sessions_user_id_key" ON "sessions" ("user_id");
 
 CREATE TABLE "user_favourites" (
   "user_id" bigint NOT NULL,

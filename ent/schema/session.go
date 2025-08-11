@@ -13,13 +13,13 @@ type Session struct {
 func (Session) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").NotEmpty().Immutable(),
-		field.Int("user_id").Unique().Immutable(),
+		field.Int("user_id").Immutable(),
 	}
 }
 
 func (Session) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("owner", User.Type).Ref("session").Unique().Field("user_id").Required().Immutable(),
+		edge.From("owner", User.Type).Ref("sessions").Unique().Field("user_id").Required().Immutable(),
 	}
 }
 

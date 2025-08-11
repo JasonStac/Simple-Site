@@ -22,6 +22,6 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("owns", Post.Type),
 		edge.To("favourites", Post.Type),
-		edge.To("session", Session.Type).Unique(),
+		edge.To("sessions", Session.Type),
 	}
 }

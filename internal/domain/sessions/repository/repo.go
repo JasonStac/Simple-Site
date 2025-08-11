@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"goserv/ent/gen"
-	"goserv/ent/gen/session"
+	entSession "goserv/ent/gen/session"
 	"goserv/internal/domain/sessions"
 )
 
@@ -28,7 +28,7 @@ func (repo *sessionRepo) Login(ctx context.Context, session *sessions.Session) e
 }
 
 func (repo *sessionRepo) Logout(ctx context.Context, sessionID string) error {
-	_, err := repo.client.Session.Delete().Where(session.IDEQ(sessionID)).Exec(ctx)
+	_, err := repo.client.Session.Delete().Where(entSession.IDEQ(sessionID)).Exec(ctx)
 	return err
 }
 
@@ -39,6 +39,9 @@ func (repo *sessionRepo) Logout(ctx context.Context, sessionID string) error {
 // }
 
 func (repo *sessionRepo) GetUserIDBySessionID(ctx context.Context, sessionID string) (int, error) {
-	session, err := repo.client.Session.Query().Where(session.IDEQ(sessionID)).Only(ctx)
-	return session.UserID, err
+	session, err := repo.client.Session.Query().Where(entSession.IDEQ(sessionID)).Only(ctx)
+	if err != nil {
+		return -1, err
+	}
+	return session.UserID, nil
 }
