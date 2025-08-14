@@ -12,9 +12,9 @@ Below are some screenshots of the site's current state:
 ![](assets/logout.png)
 ![](assets/profile.png)
 ![](assets/adding.png)
-![](assets/uploads.png)
 ![](assets/tags.png)
 ![](assets/artists.png)
+![](assets/uploads.png)
 ![](assets/list.png)
 ![](assets/single_view.png)
 
