@@ -62,11 +62,11 @@ GET   /                    /internal/server/router@initRoutes
 GET   /register            /internal/domain/user/handler/handler@DisplayRegister
 POST  /register            /internal/domain/user/handler/handler@Register
 
-GET   /register            /internal/domain/session/handler/handler@DisplayLogin
-POST  /register            /internal/domain/session/handler/handler@Login
+GET   /login               /internal/domain/session/handler/handler@DisplayLogin
+POST  /login               /internal/domain/session/handler/handler@Login
 
-GET   /register            /internal/domain/session/handler/handler@DisplayLogout
-POST  /register            /internal/domain/session/handler/handler@Logout
+GET   /logout              /internal/domain/session/handler/handler@DisplayLogout
+POST  /logout              /internal/domain/session/handler/handler@Logout
 
 GET   /view/posts          /internal/domain/post/handler/handler@ListPosts
 GET   /view/posts/{id}     /internal/domain/post/handler/handler@ViewPost
