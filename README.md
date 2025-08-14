@@ -19,7 +19,7 @@ Below are some screenshots of the site's current state:
 ![](assets/single_view.png)
 
 # Tools Used
-Currently, I've used Go with ent + chi for the backend, while having static HTML files served with some CSS and js attached. I'm also currently using [Tagify](https://github.com/yairEO/tagify) for selecting artists and tags for a post. I'm also using a PostgreSQL database.
+Currently, I've used Go with [ent](https://github.com/ent/ent) + [chi](https://github.com/go-chi/chi) for the backend, while having static HTML files served with some CSS and js attached. I'm also currently using [Tagify](https://github.com/yairEO/tagify) for selecting artists and tags for a post. I'm also using a PostgreSQL database.
 
 # Current Features
   - [x] Support for posts to contain image data
