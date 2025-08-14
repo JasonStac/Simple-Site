@@ -77,5 +77,5 @@ GET   /profile             /internal/domain/user/handler/handler@Profile
 GET   /profile/create      /internal/domain/post/handelr/handler@ViewAddPost
 POST  /profile/create      /internal/domain/post/handler/handler@AddPost
 GET   /profile/uploads     /internal/domain/post/handler/handler@ListUserPosts
-GET   /profile/favourites  /internal/domain/post/handler/handler@
+GET   /profile/favourites  /internal/domain/post/handler/handler@ListUserFavs
 ```
