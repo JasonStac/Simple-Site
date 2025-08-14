@@ -56,6 +56,7 @@ Currently planned future features include:
   - A settings option to customize/personalize website view
 
 # Routes
+```
 GET   /                    /internal/server/router@initRoutes
 
 GET   /register            /internal/domain/user/handler/handler@DisplayRegister
@@ -76,4 +77,5 @@ GET   /profile             /internal/domain/user/handler/handler@Profile
 GET   /profile/create      /internal/domain/post/handelr/handler@ViewAddPost
 POST  /profile/create      /internal/domain/post/handler/handler@AddPost
 GET   /profile/uploads     /internal/domain/post/handler/handler@ListUserPosts
-GET   /profile/favourites  /internal/domain/post/handler/handler@ListUserFavs
+GET   /profile/favourites  /internal/domain/post/handler/handler@
+```
