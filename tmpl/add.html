@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="/styles/navigation-bar.css">
+  <link rel="stylesheet" href="https://unpkg.com/@yaireo/tagify/dist/tagify.css">
   <title>Starting for booru</title>
 </head>
 
@@ -22,18 +23,65 @@
 
   <h1>Adding Content</h1>
 
-  <form action="/profile/post" method="POST" enctype="multipart/form-data">
-    <div>Title: <textarea name="title" rows="1" cols="30"></textarea></div>
-    <div>Type: 
-      <select name="media">
-        {{range .MediaTypes}}
-          <option value="{{.}}">{{.}}</option>
-        {{end}}
-      </select>
-    </div>
-    <div>File: <input name="file" type="file"/></div>
+  <form action="/profile/create" method="POST" enctype="multipart/form-data">
+    <label for="title">Title: </label>
+    <textarea id="title" name="title" rows="1" cols="30"></textarea><br />
+
+    <label for="mediaSelect">Type: </label>
+    <select id="mediaSelect" name="media">
+      {{range .MediaTypes}}
+        <option value="{{.}}">{{.}}</option>
+      {{end}}
+    </select><br />
+
+    <label for="file">File: </label>
+    <input id="file" name="file" type="file"/><br /><br /><br />
+
+    <label for="artistSelect">Artists: </label>
+    <input id="artistSelect" name="artists"><br />
+
+    <label for="tagSelect">Tags: </label>
+    <input id="tagSelect" name="tags"><br />
+
     <br />
+
     <div><input type="submit" value="Save"></div>
   </form>
+
+  <script src="https://unpkg.com/@yaireo/tagify"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const artistList = [
+        {{- range .ArtistList }}
+        { id: {{.ID}}, value: "{{.Name}}" },
+        {{- end }}
+      ];
+
+      const tagList = [
+        {{- range .TagList }}
+        { id: {{.ID}}, value: "{{.Name}}" },
+        {{- end }}
+      ];
+
+      new Tagify(document.querySelector('#artistSelect'), {
+        whitelist: artistList,
+        enforceWhitelist: false,
+        dropdown: {
+          enabled: 0,
+          maxItems: 20
+        }
+      });
+
+      new Tagify(document.querySelector('#tagSelect'), {
+        whitelist: tagList,
+        enforcedWhitelist: false,
+        dropdown: {
+          enabled: 0,
+          maxItems: 20
+        }
+      })
+    });
+  </script>
 </body>
 </html>

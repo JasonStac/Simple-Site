@@ -30,6 +30,20 @@
   <div>
     <img src="/assets/images/{{.Path}}" alt="Image"> <!--TODO: update when multiple content types implemented-->
   </div>
+  <div>
+    <p style="color: white;">
+      <b>Artists:</b>
+      {{range .Artists}}
+       {{.Name}} <!--TODO: add bubble styles around each name-->
+      {{end}}
+    </p>
+    <p style="color: white;">
+      <b>Tags:</b>
+      {{range .Tags}}
+       {{.Name}} <!--TODO: add bubble styles around each name-->
+      {{end}}
+    </p>
+  </div>
   
 </body>
 </html>

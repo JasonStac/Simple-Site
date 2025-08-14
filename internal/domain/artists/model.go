@@ -1,6 +1,6 @@
 package artists
 
 type Artist struct {
-	ID   int
-	Name string
+	ID   int    `json:"id,omitempty"`
+	Name string `json:"value"`
 }

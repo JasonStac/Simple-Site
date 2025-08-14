@@ -7,6 +7,7 @@ import (
 )
 
 type Tag interface {
+	AddTag(ctx context.Context, name string) (int, error)
 	ListTags(ctx context.Context) ([]tags.Tag, error)
 }
 
@@ -16,6 +17,14 @@ type tagRepository struct {
 
 func NewTagRepository(client *gen.Client) *tagRepository {
 	return &tagRepository{client: client}
+}
+
+func (repo *tagRepository) AddTag(ctx context.Context, name string) (int, error) {
+	entTag, err := repo.client.Tag.Create().Save(ctx)
+	if err != nil {
+		return -1, err
+	}
+	return entTag.ID, nil
 }
 
 func (repo *tagRepository) ListTags(ctx context.Context) ([]tags.Tag, error) {

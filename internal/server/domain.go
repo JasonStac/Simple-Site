@@ -19,33 +19,26 @@ import (
 )
 
 func (s *Server) initDomain() {
-	artistHandler := s.initArtist()
-	tagHandler := s.initTag()
-	postHandler := s.initPost()
+	postHandler, tagHandler, artistHandler := s.initContent()
 	userHandler, sessionHandler := s.initAuth()
 
 	s.initRoutes(artistHandler, tagHandler, postHandler, userHandler, sessionHandler)
 }
 
-func (s *Server) initArtist() *artistHandler.ArtistHandler {
-	repo := artistRepo.NewArtistRepository(s.ent)
-	service := artistService.NewArtistService(repo)
-	handler := artistHandler.NewArtistHandler(service, s.tmplCache)
-	return handler
-}
+func (s *Server) initContent() (*postHandler.PostHandler, *tagHandler.TagHandler, *artistHandler.ArtistHandler) {
+	tRepo := tagRepo.NewTagRepository(s.ent)
+	tService := tagService.NewTagService(tRepo)
+	tHandler := tagHandler.NewTagHandler(tService, s.tmplCache)
 
-func (s *Server) initTag() *tagHandler.TagHandler {
-	repo := tagRepo.NewTagRepository(s.ent)
-	service := tagService.NewTagService(repo)
-	handler := tagHandler.NewTagHandler(service, s.tmplCache)
-	return handler
-}
+	aRepo := artistRepo.NewArtistRepository(s.ent)
+	aService := artistService.NewArtistService(aRepo)
+	aHandler := artistHandler.NewArtistHandler(aService, s.tmplCache)
 
-func (s *Server) initPost() *postHandler.PostHandler {
-	repo := postRepo.NewPostRepository(s.ent)
-	service := postService.NewPostService(repo)
-	handler := postHandler.NewPostHandler(service, s.tmplCache)
-	return handler
+	pRepo := postRepo.NewPostRepository(s.ent)
+	pService := postService.NewPostService(pRepo)
+	pHandler := postHandler.NewPostHandler(pService, tService, aService, s.tmplCache)
+
+	return pHandler, tHandler, aHandler
 }
 
 func (s *Server) initAuth() (*userHandler.UserHandler, *sessionHandler.SessionHandler) {

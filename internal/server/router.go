@@ -57,8 +57,8 @@ func (s *Server) initRoutes(
 
 	s.router.With(authMiddleware).Route("/profile", func(r chi.Router) {
 		r.Get("/", userHandler.Profile)
-		r.Get("/post", postHandler.ViewAddPost)
-		r.Post("/post", postHandler.AddPost)
+		r.Get("/create", postHandler.ViewAddPost)
+		r.Post("/create", postHandler.AddPost)
 		r.Get("/uploads", postHandler.ListUserPosts)
 		r.Get("/favourites", postHandler.ListUserFavs)
 	})

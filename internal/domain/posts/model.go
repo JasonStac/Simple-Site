@@ -12,6 +12,6 @@ type Post struct {
 	MediaType models.MediaType
 	Filename  string
 
-	Artists []*artists.Artist
-	Tags    []*tags.Tag
+	Artists *[]artists.Artist
+	Tags    *[]tags.Tag
 }

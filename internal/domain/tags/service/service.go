@@ -14,6 +14,10 @@ func NewTagService(repo repository.Tag) *TagService {
 	return &TagService{repo: repo}
 }
 
+func (s *TagService) AddTag(ctx context.Context, name string) (int, error) {
+	return s.repo.AddTag(ctx, name)
+}
+
 func (s *TagService) ListTags(ctx context.Context) ([]tags.Tag, error) {
 	return s.repo.ListTags(ctx)
 }

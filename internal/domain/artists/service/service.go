@@ -14,6 +14,10 @@ func NewArtistService(repo repository.Artist) *ArtistService {
 	return &ArtistService{repo: repo}
 }
 
+func (s *ArtistService) AddArtist(ctx context.Context, name string) (int, error) {
+	return s.repo.AddArtist(ctx, name)
+}
+
 func (s *ArtistService) ListArtists(ctx context.Context) ([]artists.Artist, error) {
 	return s.repo.ListArtists(ctx)
 }

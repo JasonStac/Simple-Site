@@ -1,6 +1,6 @@
 package tags
 
 type Tag struct {
-	ID   int
-	Name string
+	ID   int    `json:"id,omitempty"`
+	Name string `json:"value"`
 }
