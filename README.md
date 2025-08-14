@@ -38,22 +38,22 @@ Currently, I've used Go with [ent](https://github.com/ent/ent) + [chi](https://g
 
 # Planned Features
 Currently planned future features include:
-  - [] Support for posts to contain audio, video, and book/compilation data
-  - [] The ability to favourite posts
-  - [] The ability to download posts
-  - [] The ability to delete your own posts
-  - [] The ability to update your own posts
-  - [] Adding timeouts for sessions in both cookie and database
-  - [] The ability to filter posts by search on titles
-  - [] The ability to filter posts by search on tags
-  - [] The ability to filter posts by search on artists
-  - [] The ability to filter posts by search on a combination of titles, tags, and artists
-  - [] Add admin functionality to add/update/delete any post, tag, artist, or user
-  - [] Add pagination to the post list view
-  - [] Add a logger to the backend
-  - [] Redis for caching
-  - [] ElasticSearch for complex post searches
-  - [] A settings option to customize/personalize website view
+  - Support for posts to contain audio, video, and book/compilation data
+  - The ability to favourite posts
+  - The ability to download posts
+  - The ability to delete your own posts
+  - The ability to update your own posts
+  - Adding timeouts for sessions in both cookie and database
+  - The ability to filter posts by search on titles
+  - The ability to filter posts by search on tags
+  - The ability to filter posts by search on artists
+  - The ability to filter posts by search on a combination of titles, tags, and artists
+  - Add admin functionality to add/update/delete any post, tag, artist, or user
+  - Add pagination to the post list view
+  - Add a logger to the backend
+  - Redis for caching
+  - ElasticSearch for complex post searches
+  - A settings option to customize/personalize website view
 
 # Routes
 GET   /                    /internal/server/router@initRoutes
