@@ -20,7 +20,7 @@ func NewTagRepository(client *gen.Client) *tagRepository {
 }
 
 func (repo *tagRepository) AddTag(ctx context.Context, name string) (int, error) {
-	entTag, err := repo.client.Tag.Create().Save(ctx)
+	entTag, err := repo.client.Tag.Create().SetName(name).Save(ctx)
 	if err != nil {
 		return -1, err
 	}

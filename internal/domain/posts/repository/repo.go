@@ -30,12 +30,12 @@ func NewPostRepository(client *gen.Client) *postRepository {
 }
 
 func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userID int) (int, error) {
-	var tagIDs []int
-	for _, t := range *post.Tags {
+	var tagIDs = make([]int, 0, len(post.Tags))
+	for _, t := range post.Tags {
 		tagIDs = append(tagIDs, t.ID)
 	}
-	var artistIDs []int
-	for _, a := range *post.Artists {
+	var artistIDs = make([]int, 0, len(post.Artists))
+	for _, a := range post.Artists {
 		artistIDs = append(artistIDs, a.ID)
 	}
 	// TODO: look at figuring out proper domain tag/artist into ent tag/artist and using those
@@ -88,8 +88,8 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 		MediaType: models.MediaType(post.MediaType),
 		Filename:  post.Filename,
 
-		Artists: &domainArtists,
-		Tags:    &domainTags,
+		Artists: domainArtists,
+		Tags:    domainTags,
 	}
 	return result, nil
 }

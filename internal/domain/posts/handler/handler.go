@@ -107,29 +107,29 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, t := range tags {
-		if t.ID == 0 {
-			id, err := h.tagSvc.AddTag(r.Context(), t.Name)
+	for i := range tags {
+		if tags[i].ID == 0 {
+			id, err := h.tagSvc.AddTag(r.Context(), tags[i].Name)
 			if err != nil {
 				http.Error(w, "Failed to add tag", http.StatusInternalServerError)
 				return
 			}
-			t.ID = id
+			tags[i].ID = id
 		}
 	}
 
-	for _, a := range artists {
-		if a.ID == 0 {
-			id, err := h.artistSvc.AddArtist(r.Context(), a.Name)
+	for i := range artists {
+		if artists[i].ID == 0 {
+			id, err := h.artistSvc.AddArtist(r.Context(), artists[i].Name)
 			if err != nil {
 				http.Error(w, "Failed to add artist", http.StatusInternalServerError)
 				return
 			}
-			a.ID = id
+			artists[i].ID = id
 		}
 	}
 
-	post := &posts.Post{Title: title, MediaType: models.MediaType(fileMedia), Filename: header.Filename, Tags: &tags, Artists: &artists}
+	post := &posts.Post{Title: title, MediaType: models.MediaType(fileMedia), Filename: header.Filename, Tags: tags, Artists: artists}
 	err = h.postSvc.AddPost(r.Context(), post, file, userID)
 	if err != nil {
 		http.Error(w, "Failed to add post", http.StatusInternalServerError)
@@ -204,8 +204,8 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 	}{
 		Path:    path,
 		IsUser:  isUser,
-		Artists: *post.Artists,
-		Tags:    *post.Tags,
+		Artists: post.Artists,
+		Tags:    post.Tags,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)

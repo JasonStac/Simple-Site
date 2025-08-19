@@ -20,7 +20,7 @@ func NewArtistRepository(client *gen.Client) *artistRepository {
 }
 
 func (repo *artistRepository) AddArtist(ctx context.Context, name string) (int, error) {
-	entArtist, err := repo.client.Artist.Create().Save(ctx)
+	entArtist, err := repo.client.Artist.Create().SetName(name).Save(ctx)
 	if err != nil {
 		return -1, err
 	}
