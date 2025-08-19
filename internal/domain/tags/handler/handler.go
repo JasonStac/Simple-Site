@@ -23,10 +23,9 @@ func (h *TagHandler) ListTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []string
-	for _, tag := range tags {
-		name := tag.Name
-		response = append(response, name)
+	response := make([]string, len(tags))
+	for i := range tags {
+		response[i] = tags[i].Name
 	}
 
 	isUser := false

@@ -146,10 +146,12 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var responses []ResponseEntry
-	for _, post := range posts {
-		path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
-		responses = append(responses, ResponseEntry{Path: path, ID: post.ID})
+	paths := make([]ResponseEntry, len(posts))
+	for i := range posts {
+		paths[i] = ResponseEntry{
+			Path: path.Join(posts[i].Filename[0:2], posts[i].Filename[2:4], posts[i].Filename),
+			ID:   posts[i].ID,
+		}
 	}
 
 	isUser := false
@@ -162,7 +164,7 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 		Posts  []ResponseEntry
 		IsUser bool
 	}{
-		Posts:  responses,
+		Posts:  paths,
 		IsUser: isUser,
 	})
 	if err != nil {
@@ -225,14 +227,16 @@ func (h *PostHandler) ListUserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var responses []ResponseEntry
-	for _, post := range posts {
-		path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
-		responses = append(responses, ResponseEntry{Path: path, ID: post.ID})
+	paths := make([]ResponseEntry, len(posts))
+	for i := range posts {
+		paths[i] = ResponseEntry{
+			Path: path.Join(posts[i].Filename[0:2], posts[i].Filename[2:4], posts[i].Filename),
+			ID:   posts[i].ID,
+		}
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Posts []ResponseEntry }{
-		Posts: responses,
+		Posts: paths,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -252,14 +256,16 @@ func (h *PostHandler) ListUserFavs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var responses []ResponseEntry
-	for _, post := range posts {
-		path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
-		responses = append(responses, ResponseEntry{Path: path, ID: post.ID})
+	paths := make([]ResponseEntry, len(posts))
+	for i := range posts {
+		paths[i] = ResponseEntry{
+			Path: path.Join(posts[i].Filename[0:2], posts[i].Filename[2:4], posts[i].Filename),
+			ID:   posts[i].ID,
+		}
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Posts []ResponseEntry }{
-		Posts: responses,
+		Posts: paths,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)

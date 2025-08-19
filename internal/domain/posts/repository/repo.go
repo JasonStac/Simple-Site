@@ -30,13 +30,13 @@ func NewPostRepository(client *gen.Client) *postRepository {
 }
 
 func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userID int) (int, error) {
-	var tagIDs = make([]int, 0, len(post.Tags))
-	for _, t := range post.Tags {
-		tagIDs = append(tagIDs, t.ID)
+	tagIDs := make([]int, len(post.Tags))
+	for i := range post.Tags {
+		tagIDs[i] = post.Tags[i].ID
 	}
-	var artistIDs = make([]int, 0, len(post.Artists))
-	for _, a := range post.Artists {
-		artistIDs = append(artistIDs, a.ID)
+	artistIDs := make([]int, len(post.Artists))
+	for i := range post.Artists {
+		artistIDs[i] = post.Artists[i].ID
 	}
 	// TODO: look at figuring out proper domain tag/artist into ent tag/artist and using those
 
@@ -70,16 +70,20 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 	}
 
 	//TODO: move conversions somewhere else
-	var domainArtists []artists.Artist
-	for _, a := range post.Edges.Artists {
-		artist := artists.Artist{ID: a.ID, Name: a.Name}
-		domainArtists = append(domainArtists, artist)
+	domainArtists := make([]artists.Artist, 0, len(post.Edges.Artists))
+	for i := range post.Edges.Artists {
+		domainArtists[i] = artists.Artist{
+			ID:   post.Edges.Artists[i].ID,
+			Name: post.Edges.Artists[i].Name,
+		}
 	}
 
-	var domainTags []tags.Tag
-	for _, t := range post.Edges.Tags {
-		tag := tags.Tag{ID: t.ID, Name: t.Name}
-		domainTags = append(domainTags, tag)
+	domainTags := make([]tags.Tag, 0, len(post.Edges.Tags))
+	for i := range post.Edges.Tags {
+		domainTags[i] = tags.Tag{
+			ID:   post.Edges.Tags[i].ID,
+			Name: post.Edges.Tags[i].Name,
+		}
 	}
 
 	result := &posts.Post{
@@ -100,8 +104,13 @@ func (repo *postRepository) ListPosts(ctx context.Context) ([]posts.Post, error)
 		return nil, err
 	}
 	returnPosts := make([]posts.Post, len(entPosts))
-	for i, p := range entPosts {
-		returnPosts[i] = posts.Post{ID: p.ID, Title: p.Title, MediaType: models.MediaType(p.MediaType), Filename: p.Filename}
+	for i := range entPosts {
+		returnPosts[i] = posts.Post{
+			ID:        entPosts[i].ID,
+			Title:     entPosts[i].Title,
+			MediaType: models.MediaType(entPosts[i].MediaType),
+			Filename:  entPosts[i].Filename,
+		}
 	}
 	return returnPosts, err
 }
@@ -109,8 +118,13 @@ func (repo *postRepository) ListPosts(ctx context.Context) ([]posts.Post, error)
 func (repo *postRepository) ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error) {
 	entPosts, err := repo.client.User.Query().Where(entUser.IDEQ(userID)).QueryOwns().All(ctx)
 	returnPosts := make([]posts.Post, len(entPosts))
-	for i, p := range entPosts {
-		returnPosts[i] = posts.Post{ID: p.ID, Title: p.Title, MediaType: models.MediaType(p.MediaType), Filename: p.Filename}
+	for i := range entPosts {
+		returnPosts[i] = posts.Post{
+			ID:        entPosts[i].ID,
+			Title:     entPosts[i].Title,
+			MediaType: models.MediaType(entPosts[i].MediaType),
+			Filename:  entPosts[i].Filename,
+		}
 	}
 	return returnPosts, err
 }
@@ -118,8 +132,13 @@ func (repo *postRepository) ListUserPosts(ctx context.Context, userID int) ([]po
 func (repo *postRepository) ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error) {
 	entPosts, err := repo.client.User.Query().Where(entUser.IDEQ(userID)).QueryFavourites().All(ctx)
 	returnPosts := make([]posts.Post, len(entPosts))
-	for i, p := range entPosts {
-		returnPosts[i] = posts.Post{ID: p.ID, Title: p.Title, MediaType: models.MediaType(p.MediaType), Filename: p.Filename}
+	for i := range entPosts {
+		returnPosts[i] = posts.Post{
+			ID:        entPosts[i].ID,
+			Title:     entPosts[i].Title,
+			MediaType: models.MediaType(entPosts[i].MediaType),
+			Filename:  entPosts[i].Filename,
+		}
 	}
 	return returnPosts, err
 }

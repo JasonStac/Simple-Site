@@ -30,8 +30,11 @@ func (repo *tagRepository) AddTag(ctx context.Context, name string) (int, error)
 func (repo *tagRepository) ListTags(ctx context.Context) ([]tags.Tag, error) {
 	entTags, err := repo.client.Tag.Query().All(ctx)
 	returnTags := make([]tags.Tag, len(entTags))
-	for i, t := range entTags {
-		returnTags[i] = tags.Tag{ID: t.ID, Name: t.Name}
+	for i := range entTags {
+		returnTags[i] = tags.Tag{
+			ID:   entTags[i].ID,
+			Name: entTags[i].Name,
+		}
 	}
 	return returnTags, err
 }

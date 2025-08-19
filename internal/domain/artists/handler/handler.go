@@ -23,10 +23,9 @@ func (h *ArtistHandler) ListArtists(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []string
-	for _, artist := range artists {
-		name := artist.Name
-		response = append(response, name)
+	response := make([]string, len(artists))
+	for i := range artists {
+		response[i] = artists[i].Name
 	}
 
 	isUser := false
