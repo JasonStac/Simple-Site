@@ -30,8 +30,8 @@ func (repo *artistRepository) AddArtist(ctx context.Context, name string) (int, 
 func (repo *artistRepository) ListArtists(ctx context.Context) ([]artists.Artist, error) {
 	entArtists, err := repo.client.Artist.Query().All(ctx)
 	returnArtists := make([]artists.Artist, len(entArtists))
-	for i, a := range entArtists {
-		returnArtists[i] = artists.Artist{ID: a.ID, Name: a.Name}
+	for i := range entArtists {
+		returnArtists[i] = artists.Artist{ID: entArtists[i].ID, Name: entArtists[i].Name}
 	}
 	return returnArtists, err
 }
