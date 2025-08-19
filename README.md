@@ -4,20 +4,6 @@ A simple image board style site to practice various parts of web development. Du
 # Motivation
 With most of my current experience being in systems level development, I wanted to try gaining some practical experience in web development and decided to make a simple website. Having my own catalogue of pictures from vacations and other memories, I figured making an image board style site could help me learn skills that carry over into structuring them in a more accessible, tag-based file structure.
 
-# Stuff
-Below are some screenshots of the site's current state:
-![](assets/home.png)
-![](assets/register.png)
-![](assets/login.png)
-![](assets/logout.png)
-![](assets/profile.png)
-![](assets/adding.png)
-![](assets/tags.png)
-![](assets/artists.png)
-![](assets/uploads.png)
-![](assets/list.png)
-![](assets/single_view.png)
-
 # Tools Used
 Currently, I've used Go with [ent](https://github.com/ent/ent) + [chi](https://github.com/go-chi/chi) for the backend, while having static HTML files served with some CSS and js attached. I'm also currently using [Tagify](https://github.com/yairEO/tagify) for selecting artists and tags for a post. I'm also using a PostgreSQL database.
 
@@ -79,3 +65,17 @@ POST  /profile/create      /internal/domain/post/handler/handler@AddPost
 GET   /profile/uploads     /internal/domain/post/handler/handler@ListUserPosts
 GET   /profile/favourites  /internal/domain/post/handler/handler@ListUserFavs
 ```
+
+# Display
+Below are some screenshots of the site's current state:
+![](assets/home.png)
+![](assets/register.png)
+![](assets/login.png)
+![](assets/logout.png)
+![](assets/profile.png)
+![](assets/adding.png)
+![](assets/tags.png)
+![](assets/artists.png)
+![](assets/uploads.png)
+![](assets/list.png)
+![](assets/single_view.png)
