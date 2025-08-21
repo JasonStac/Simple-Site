@@ -30,12 +30,33 @@
         <a href="/view/posts/{{.ID}}">
           <img src="/assets/images/{{.Path}}" alt="Image">
         </a>
-        <form method="POST" action="/delete">
-          <button type="submit" class="btn" name="id" value="{{.ID}}">Delete</button>
-        </form>
+        <button onclick="sendPost('{{.ID}}', this)" class="btn">Delete</button>
       </div>
     {{end}}
   </div>
   
+  <script>
+    function sendPost(value, btn) {
+      const params = new URLSearchParams();
+      params.append("id", value);
+
+      fetch("/delete", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/x-www-form-urlencoded"
+        },
+        body: params.toString()
+      })
+      .then(res => {
+        if (res.ok) {
+          const box = btn.closest(".image-box");
+          if (box) {
+            box.remove();
+          }
+        }
+      })
+      .catch(err => console.error("Error: ", err));
+    }
+  </script>
 </body>
 </html>
