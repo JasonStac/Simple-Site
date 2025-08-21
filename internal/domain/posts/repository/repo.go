@@ -56,10 +56,6 @@ func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userI
 }
 
 func (repo *postRepository) DeletePost(ctx context.Context, postID int) error {
-	// post, err := repo.client.Post.Query().Select(entPost.FieldFilename).Where(entPost.IDEQ(postID)).Only(ctx)
-	// if err != nil {
-	// 	return "", err
-	// }
 	return repo.client.Post.DeleteOneID(postID).Exec(ctx)
 }
 
