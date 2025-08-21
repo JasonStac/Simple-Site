@@ -19,6 +19,7 @@ type Post interface {
 	ListPosts(ctx context.Context) ([]posts.Post, error)
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
 	ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error)
+	FavouritePost(ctx context.Context, postID int, userID int) error
 }
 
 type postRepository struct {
@@ -141,4 +142,8 @@ func (repo *postRepository) ListUserFavs(ctx context.Context, userID int) ([]pos
 		}
 	}
 	return returnPosts, err
+}
+
+func (repo *postRepository) FavouritePost(ctx context.Context, postID int, userID int) error {
+	return repo.client.User.UpdateOneID(userID).AddFavouriteIDs(postID).Exec(ctx)
 }

@@ -6,11 +6,19 @@
 }
 
 .btn {
-  background: crimson;
+  background: white;
   color: white;
   padding: 6px 12px;
   border-radius: 4px;
   border: none;
   cursor: pointer;
   font-weight: bold;
+}
+
+.btn.delete {
+  background: red;
+}
+
+.btn.favourite {
+  background: deeppink;
 }

@@ -66,6 +66,7 @@ func (s *Server) initRoutes(
 	})
 
 	s.router.With(authMiddleware, deleteMiddleware).Post("/delete", postHandler.DeletePost)
+	s.router.With(authMiddleware).Post("/favourite", postHandler.FavouritePost)
 
 	s.router.Mount("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
 	s.router.Mount("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("content"))))

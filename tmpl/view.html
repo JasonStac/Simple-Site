@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="/styles/navigation-bar.css">
+  <link rel="stylesheet" href="/styles/image-buttons.css">
   <title>Starting for booru</title>
 </head>
 
@@ -27,23 +28,49 @@
 
   <h1 style="color: white;">Viewing Content</h1>
 
-  <div>
-    <img src="/assets/images/{{.Path}}" alt="Image"> <!--TODO: update when multiple content types implemented-->
-  </div>
-  <div>
-    <p style="color: white;">
-      <b>Artists:</b>
-      {{range .Artists}}
-       {{.Name}} <!--TODO: add bubble styles around each name-->
-      {{end}}
-    </p>
-    <p style="color: white;">
-      <b>Tags:</b>
-      {{range .Tags}}
-       {{.Name}} <!--TODO: add bubble styles around each name-->
-      {{end}}
-    </p>
-  </div>
-  
+  <section>
+    <div>
+      <p style="color: white;">
+        <b>Artists:</b>
+        {{range .Artists}}
+        {{.Name}} <!--TODO: add bubble styles around each name-->
+        {{end}}
+      </p>
+      <p style="color: white;">
+        <b>Tags:</b>
+        {{range .Tags}}
+        {{.Name}} <!--TODO: add bubble styles around each name-->
+        {{end}}
+      </p>
+    </div>
+    <!--TODO: add button for displaying full size image-->
+    <div class="image-box" style="justify-content: center;">
+      <button onclick="favouritePost('{{.ID}}', this)" class="btn favourite">Favourite</button>
+      <img style="max-width: 850px; max-height: 700px" src="/assets/images/{{.Path}}" alt="Image"> <!--TODO: update when multiple content types implemented-->
+    </div>
+    </div>
+  </section>
+  <script>
+    function favouritePost(value, btn) {
+      const params = new URLSearchParams();
+      params.append("id", value);
+
+      fetch("/favourite", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/x-www-form-urlencoded"
+        },
+        body: params.toString()
+      })
+      .then(res => {
+        if (res.ok) {
+          btn.textContent = "Unfavourite";
+        }
+      })
+      .catch(err => {
+        console.error("Error: ", err);
+      })
+    }
+  </script>
 </body>
 </html>

@@ -17,6 +17,7 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"strconv"
 )
 
 type ResponseEntry struct {
@@ -206,11 +207,13 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 
 	err = h.tmpl.ExecuteTemplate(w, "view.html", struct {
 		Path    string
+		ID      int
 		IsUser  bool
 		Artists []artists.Artist
 		Tags    []tags.Tag
 	}{
 		Path:    path,
+		ID:      postID,
 		IsUser:  isUser,
 		Artists: post.Artists,
 		Tags:    post.Tags,
@@ -299,4 +302,24 @@ func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/profile/uploads", http.StatusSeeOther)
+}
+
+func (h *PostHandler) FavouritePost(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		http.Error(w, "Error reading user id", http.StatusBadRequest)
+		return
+	}
+
+	postID, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		http.Error(w, "Error getting post id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.postSvc.FavouritePost(r.Context(), postID, userID)
+	if err != nil {
+		http.Error(w, "Error favouriting post", http.StatusInternalServerError)
+		return
+	}
 }
