@@ -15,7 +15,6 @@ import (
 type Post interface {
 	AddPost(ctx context.Context, post *posts.Post, userID int) (int, error)
 	DeletePost(ctx context.Context, postID int) error
-	GetPostOwnerID(ctx context.Context, postID int) (int, error)
 	GetPost(ctx context.Context, postID int) (*posts.Post, error)
 	ListPosts(ctx context.Context) ([]posts.Post, error)
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
@@ -62,15 +61,6 @@ func (repo *postRepository) DeletePost(ctx context.Context, postID int) error {
 	// 	return "", err
 	// }
 	return repo.client.Post.DeleteOneID(postID).Exec(ctx)
-}
-
-func (repo *postRepository) GetPostOwnerID(ctx context.Context, postID int) (int, error) {
-	post, err := repo.client.Post.Query().Select(entPost.FieldUserOwns).Where(entPost.IDEQ(postID)).Only(ctx)
-	if err != nil {
-		return -1, err
-	}
-
-	return post.UserOwns, nil
 }
 
 func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Post, error) {
