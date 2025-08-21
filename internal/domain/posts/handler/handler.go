@@ -297,4 +297,6 @@ func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error deleting post", http.StatusInternalServerError)
 		return
 	}
+
+	http.Redirect(w, r, "/profile/uploads", http.StatusSeeOther)
 }
