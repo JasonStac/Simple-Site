@@ -7,6 +7,7 @@ import (
 	"goserv/internal/domain/posts"
 	"goserv/internal/domain/posts/repository"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -61,7 +62,10 @@ func (s *PostService) AddPost(ctx context.Context, post *posts.Post, content mul
 	}
 
 	if err := os.Rename(tempFile.Name(), finalPath); err != nil {
-		_ = s.repo.DeletePost(ctx, postID)
+		dbErr := s.repo.DeletePost(ctx, postID)
+		if dbErr != nil {
+			log.Printf("Error deleting post from db, %v\n", dbErr)
+		}
 		return err
 	}
 
@@ -82,4 +86,18 @@ func (s *PostService) ListUserPosts(ctx context.Context, userID int) ([]posts.Po
 
 func (s *PostService) ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error) {
 	return s.repo.ListUserFavs(ctx, userID)
+}
+
+func (s *PostService) DeletePost(ctx context.Context, postID int, filepath string) error {
+	err := s.repo.DeletePost(ctx, postID)
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(filepath)
+	if err != nil {
+		log.Printf("Failed to remove file during delete for file: %s\n", filepath)
+		return nil
+	}
+	return nil
 }

@@ -22,6 +22,7 @@ func (s *Server) initRoutes(
 
 	authMiddleware := middleware.AuthRestrictMiddleware(s.session)
 	checkMiddleware := middleware.AuthCheckMiddleware(s.session)
+	deleteMiddleware := middleware.DeleteMiddleware(s.user, s.post)
 
 	s.router.With(checkMiddleware).Get("/",
 		func(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +51,7 @@ func (s *Server) initRoutes(
 
 	s.router.With(checkMiddleware).Route("/view", func(r chi.Router) {
 		r.Get("/posts", postHandler.ListPosts)
-		r.Mount("/posts/", http.HandlerFunc(postHandler.ViewPost))
+		r.Mount("/posts/", routeSinglePosts(postHandler))
 		r.Get("/tags", tagHandler.ListTags)
 		r.Get("/artists", artistHandler.ListArtists)
 	})
@@ -60,8 +61,11 @@ func (s *Server) initRoutes(
 		r.Get("/create", postHandler.ViewAddPost)
 		r.Post("/create", postHandler.AddPost)
 		r.Get("/uploads", postHandler.ListUserPosts)
+		//r.Mount("/uploads/", routeSingleUploads(postHandler))
 		r.Get("/favourites", postHandler.ListUserFavs)
 	})
+
+	s.router.With(authMiddleware, deleteMiddleware).Post("/delete", postHandler.DeletePost)
 
 	s.router.Mount("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
 	s.router.Mount("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("content"))))
@@ -71,3 +75,25 @@ func (s *Server) initRoutes(
 		http.NotFound(w, r)
 	})
 }
+
+func routeSinglePosts(postHandler *postHandler.PostHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			postHandler.ViewPost(w, r)
+		default:
+			http.Error(w, "Unsupported status method", http.StatusMethodNotAllowed)
+		}
+	}
+}
+
+// func routeSingleUploads(postHandler *postHandler.PostHandler) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		switch r.Method {
+// 		case http.MethodPost:
+// 			postHandler.DeletePost(w, r)
+// 		default:
+// 			http.Error(w, "Unsupported status method", http.StatusMethodNotAllowed)
+// 		}
+// 	}
+// }

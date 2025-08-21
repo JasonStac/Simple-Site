@@ -4,7 +4,9 @@ import (
 	"context"
 	"goserv/ent/gen"
 	"goserv/internal/database"
-	"goserv/internal/domain/sessions/repository"
+	pRepo "goserv/internal/domain/posts/repository"
+	sRepo "goserv/internal/domain/sessions/repository"
+	uRepo "goserv/internal/domain/users/repository"
 	"goserv/pkg/config"
 	"goserv/pkg/templates"
 	"html/template"
@@ -25,7 +27,9 @@ type Server struct {
 
 	ent *gen.Client
 
-	session repository.Session
+	user    uRepo.User
+	session sRepo.Session
+	post    pRepo.Post
 
 	router *chi.Mux
 

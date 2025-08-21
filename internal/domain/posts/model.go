@@ -11,6 +11,7 @@ type Post struct {
 	Title     string
 	MediaType models.MediaType
 	Filename  string
+	OwnerID   int
 
 	Artists []artists.Artist
 	Tags    []tags.Tag

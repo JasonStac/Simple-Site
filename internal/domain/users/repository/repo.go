@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"goserv/ent/gen"
-	"goserv/ent/gen/user"
+	entUser "goserv/ent/gen/user"
 	"goserv/internal/domain/users"
 
 	"golang.org/x/crypto/bcrypt"
@@ -14,6 +14,7 @@ type User interface {
 	GetByUsername(ctx context.Context, username string) (*users.User, error)
 	CheckPassword(ctx context.Context, username string, password string) (*users.User, bool, error)
 	GetByUserID(ctx context.Context, userID int) (*users.User, error)
+	IsAdmin(ctx context.Context, userID int) (bool, error)
 }
 
 type userRepository struct {
@@ -30,12 +31,15 @@ func (repo *userRepository) Register(ctx context.Context, user *users.User, pass
 }
 
 func (repo *userRepository) GetByUsername(ctx context.Context, username string) (*users.User, error) {
-	user, err := repo.client.User.Query().Where(user.UsernameEQ(username)).Only(ctx)
-	return &users.User{ID: user.ID, Username: user.Username, IsAdmin: user.IsAdmin}, err
+	user, err := repo.client.User.Query().Where(entUser.UsernameEQ(username)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &users.User{ID: user.ID, Username: user.Username, IsAdmin: user.IsAdmin}, nil
 }
 
 func (repo *userRepository) CheckPassword(ctx context.Context, username string, password string) (*users.User, bool, error) {
-	user, err := repo.client.User.Query().Where(user.UsernameEQ(username)).Only(ctx)
+	user, err := repo.client.User.Query().Where(entUser.UsernameEQ(username)).Only(ctx)
 	if err != nil {
 		return nil, false, err
 	}
@@ -48,6 +52,17 @@ func (repo *userRepository) CheckPassword(ctx context.Context, username string, 
 }
 
 func (repo *userRepository) GetByUserID(ctx context.Context, userID int) (*users.User, error) {
-	user, err := repo.client.User.Query().Where(user.IDEQ(userID)).Only(ctx)
-	return &users.User{ID: user.ID, Username: user.Username, IsAdmin: user.IsAdmin}, err
+	user, err := repo.client.User.Query().Where(entUser.IDEQ(userID)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &users.User{ID: user.ID, Username: user.Username, IsAdmin: user.IsAdmin}, nil
+}
+
+func (repo *userRepository) IsAdmin(ctx context.Context, userID int) (bool, error) {
+	user, err := repo.client.User.Query().Select(entUser.FieldIsAdmin).Where(entUser.IDEQ(userID)).Only(ctx)
+	if err != nil {
+		return false, err
+	}
+	return user.IsAdmin, nil
 }

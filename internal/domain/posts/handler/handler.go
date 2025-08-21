@@ -14,6 +14,7 @@ import (
 	"goserv/internal/utils"
 	myErrors "goserv/internal/utils/errors"
 	"html/template"
+	"log"
 	"net/http"
 	"path"
 )
@@ -95,16 +96,21 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 
 	jsonTags := r.FormValue("tags")
 	var tags []tags.Tag
-	if err := json.Unmarshal([]byte(jsonTags), &tags); err != nil {
-		http.Error(w, "Failed to read tags", http.StatusBadRequest)
-		return
+	if jsonTags != "" {
+		if err := json.Unmarshal([]byte(jsonTags), &tags); err != nil {
+			http.Error(w, "Failed to read tags", http.StatusBadRequest)
+			return
+		}
 	}
 
 	jsonArtists := r.FormValue("artists")
 	var artists []artists.Artist
-	if err := json.Unmarshal([]byte(jsonArtists), &artists); err != nil {
-		http.Error(w, "Failed to read artists", http.StatusBadRequest)
-		return
+	if jsonArtists != "" {
+		if err := json.Unmarshal([]byte(jsonArtists), &artists); err != nil {
+			log.Printf("json string: %s\n", jsonArtists)
+			http.Error(w, "Failed to read artists", http.StatusBadRequest)
+			return
+		}
 	}
 
 	for i := range tags {
@@ -264,11 +270,31 @@ func (h *PostHandler) ListUserFavs(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Posts []ResponseEntry }{
+	err = h.tmpl.ExecuteTemplate(w, "favourites.html", struct{ Posts []ResponseEntry }{
 		Posts: paths,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
+	postID, ok := middleware.GetPostID(r)
+	if !ok {
+		http.Error(w, "Error reading post ID", http.StatusBadRequest)
+		return
+	}
+
+	filepath, ok := middleware.GetFilepath(r)
+	if !ok {
+		http.Error(w, "Error reading filepath", http.StatusInternalServerError)
+		return
+	}
+
+	err := h.postSvc.DeletePost(r.Context(), postID, filepath)
+	if err != nil {
+		http.Error(w, "Error deleting post", http.StatusInternalServerError)
 		return
 	}
 }

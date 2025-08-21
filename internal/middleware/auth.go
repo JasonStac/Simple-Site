@@ -6,10 +6,6 @@ import (
 	"net/http"
 )
 
-type key string
-
-const userKey key = "user_id"
-
 func AuthRestrictMiddleware(sessionRepo repository.Session) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -47,9 +43,4 @@ func AuthCheckMiddleware(sessionRepo repository.Session) func(http.Handler) http
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
-}
-
-func GetUserID(r *http.Request) (int, bool) {
-	username, ok := r.Context().Value(userKey).(int)
-	return username, ok
 }

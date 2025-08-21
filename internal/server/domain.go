@@ -37,6 +37,7 @@ func (s *Server) initContent() (*postHandler.PostHandler, *tagHandler.TagHandler
 	pRepo := postRepo.NewPostRepository(s.ent)
 	pService := postService.NewPostService(pRepo)
 	pHandler := postHandler.NewPostHandler(pService, tService, aService, s.tmplCache)
+	s.post = pRepo
 
 	return pHandler, tHandler, aHandler
 }
@@ -45,6 +46,7 @@ func (s *Server) initAuth() (*userHandler.UserHandler, *sessionHandler.SessionHa
 	userRepo := userRepo.NewUserRepository(s.ent)
 	userService := userService.NewUserService(userRepo)
 	userHandler := userHandler.NewUserHandler(userService, s.tmplCache)
+	s.user = userRepo
 
 	sessionRepo := sessionRepo.NewSessionRepository(s.ent)
 	sessionService := sessionService.NewSessionService(sessionRepo, userService)

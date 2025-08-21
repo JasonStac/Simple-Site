@@ -15,6 +15,7 @@ import (
 type Post interface {
 	AddPost(ctx context.Context, post *posts.Post, userID int) (int, error)
 	DeletePost(ctx context.Context, postID int) error
+	GetPostOwnerID(ctx context.Context, postID int) (int, error)
 	GetPost(ctx context.Context, postID int) (*posts.Post, error)
 	ListPosts(ctx context.Context) ([]posts.Post, error)
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
@@ -56,12 +57,24 @@ func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userI
 }
 
 func (repo *postRepository) DeletePost(ctx context.Context, postID int) error {
-	_, err := repo.client.Post.Delete().Where(entPost.IDEQ(postID)).Exec(ctx)
-	return err
+	// post, err := repo.client.Post.Query().Select(entPost.FieldFilename).Where(entPost.IDEQ(postID)).Only(ctx)
+	// if err != nil {
+	// 	return "", err
+	// }
+	return repo.client.Post.DeleteOneID(postID).Exec(ctx)
+}
+
+func (repo *postRepository) GetPostOwnerID(ctx context.Context, postID int) (int, error) {
+	post, err := repo.client.Post.Query().Select(entPost.FieldUserOwns).Where(entPost.IDEQ(postID)).Only(ctx)
+	if err != nil {
+		return -1, err
+	}
+
+	return post.UserOwns, nil
 }
 
 func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Post, error) {
-	post, err := repo.client.Post.Query().Where(entPost.IDEQ(postID)).WithArtists().WithTags().First(ctx)
+	post, err := repo.client.Post.Query().Where(entPost.IDEQ(postID)).WithArtists().WithTags().Only(ctx)
 	if err != nil {
 		if gen.IsNotFound(err) {
 			return nil, errors.ErrNotFound
@@ -70,7 +83,7 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 	}
 
 	//TODO: move conversions somewhere else
-	domainArtists := make([]artists.Artist, 0, len(post.Edges.Artists))
+	domainArtists := make([]artists.Artist, len(post.Edges.Artists))
 	for i := range post.Edges.Artists {
 		domainArtists[i] = artists.Artist{
 			ID:   post.Edges.Artists[i].ID,
@@ -78,7 +91,7 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 		}
 	}
 
-	domainTags := make([]tags.Tag, 0, len(post.Edges.Tags))
+	domainTags := make([]tags.Tag, len(post.Edges.Tags))
 	for i := range post.Edges.Tags {
 		domainTags[i] = tags.Tag{
 			ID:   post.Edges.Tags[i].ID,
@@ -91,6 +104,7 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 		Title:     post.Title,
 		MediaType: models.MediaType(post.MediaType),
 		Filename:  post.Filename,
+		OwnerID:   post.UserOwns,
 
 		Artists: domainArtists,
 		Tags:    domainTags,
