@@ -1,8 +1,16 @@
 .image-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  padding: 10px;
+  gap: 10px 5px;
+  margin: 0px 140px 0px 140px;
+  padding: 20px 25px;
+  background-color: darkgray;
+}
+
+.image-grid a {
+  justify-self: start;
+  align-self: start;
+  display: inline-block;
 }
 
 .image-grid img {
@@ -10,4 +18,34 @@
   height: auto;
   display: block;
   object-fit: cover;
+}
+
+@media (max-width: 1319px) {
+  .image-grid {
+    margin: 0px 0px 0px 0px;
+  }
+}
+
+@media (max-width: 1269px) {
+  .image-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1014px) {
+  .image-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 759px) {
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 504px) {
+  .image-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
