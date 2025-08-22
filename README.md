@@ -83,3 +83,4 @@ Below are some screenshots of the site's current state:
 ![](assets/uploads.png)
 ![](assets/list.png)
 ![](assets/single_view.png)
+![](assets/favourites.png)
