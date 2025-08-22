@@ -3,8 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"goserv/internal/domain/artists"
-	aService "goserv/internal/domain/artists/service"
 	"goserv/internal/domain/posts"
 	pService "goserv/internal/domain/posts/service"
 	"goserv/internal/domain/tags"
@@ -26,23 +24,20 @@ type ResponseEntry struct {
 }
 
 type PostHandler struct {
-	postSvc   *pService.PostService
-	tagSvc    *tService.TagService
-	artistSvc *aService.ArtistService
-	tmpl      *template.Template
+	postSvc *pService.PostService
+	tagSvc  *tService.TagService
+	tmpl    *template.Template
 }
 
 func NewPostHandler(
 	postSvc *pService.PostService,
 	tagSvc *tService.TagService,
-	artistSvc *aService.ArtistService,
 	tmpl *template.Template,
 ) *PostHandler {
 	return &PostHandler{
-		postSvc:   postSvc,
-		tagSvc:    tagSvc,
-		artistSvc: artistSvc,
-		tmpl:      tmpl,
+		postSvc: postSvc,
+		tagSvc:  tagSvc,
+		tmpl:    tmpl,
 	}
 }
 
@@ -53,20 +48,24 @@ func (h *PostHandler) ViewAddPost(w http.ResponseWriter, r *http.Request) {
 		// intentionally let continue for now
 	}
 
-	artistList, err := h.artistSvc.ListArtists(r.Context())
+	peopleList, err := h.tagSvc.ListPeopleTags(r.Context())
 	if err != nil {
-		http.Error(w, "Error gettings artists", http.StatusInternalServerError)
+		http.Error(w, "Error getting people", http.StatusInternalServerError)
 		// intentionally let continue for now
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "add.html", struct {
 		MediaTypes []string
+		GeneralTag string
+		PeopleTag  string
 		TagList    []tags.Tag
-		ArtistList []artists.Artist
+		PeopleList []tags.Tag
 	}{
 		MediaTypes: models.MediaType("").Values(),
+		GeneralTag: string(models.TagGeneral),
+		PeopleTag:  string(models.TagPeople),
 		TagList:    tagList,
-		ArtistList: artistList,
+		PeopleList: peopleList,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -95,48 +94,39 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	jsonTags := r.FormValue("tags")
-	var tags []tags.Tag
-	if jsonTags != "" {
-		if err := json.Unmarshal([]byte(jsonTags), &tags); err != nil {
+	jsonGeneralTags := r.FormValue("tags")
+	log.Printf("All general: %s\n\n", jsonGeneralTags)
+	var generalTags []tags.Tag
+	if jsonGeneralTags != "" {
+		if err := json.Unmarshal([]byte(jsonGeneralTags), &generalTags); err != nil {
 			http.Error(w, "Failed to read tags", http.StatusBadRequest)
 			return
 		}
 	}
 
-	jsonArtists := r.FormValue("artists")
-	var artists []artists.Artist
-	if jsonArtists != "" {
-		if err := json.Unmarshal([]byte(jsonArtists), &artists); err != nil {
-			log.Printf("json string: %s\n", jsonArtists)
-			http.Error(w, "Failed to read artists", http.StatusBadRequest)
+	jsonPeopleTags := r.FormValue("people")
+	log.Printf("All people: %s\n\n", jsonPeopleTags)
+	var peopleTags []tags.Tag
+	if jsonPeopleTags != "" {
+		if err := json.Unmarshal([]byte(jsonPeopleTags), &peopleTags); err != nil {
+			http.Error(w, "Failed to read people", http.StatusBadRequest)
 			return
 		}
 	}
 
-	for i := range tags {
-		if tags[i].ID == 0 {
-			id, err := h.tagSvc.AddTag(r.Context(), tags[i].Name)
+	allTags := append(generalTags, peopleTags...)
+	for i := range allTags {
+		if allTags[i].ID == 0 {
+			id, err := h.tagSvc.AddTag(r.Context(), allTags[i].Name, models.TagType(allTags[i].Type))
 			if err != nil {
 				http.Error(w, "Failed to add tag", http.StatusInternalServerError)
 				return
 			}
-			tags[i].ID = id
+			allTags[i].ID = id
 		}
 	}
 
-	for i := range artists {
-		if artists[i].ID == 0 {
-			id, err := h.artistSvc.AddArtist(r.Context(), artists[i].Name)
-			if err != nil {
-				http.Error(w, "Failed to add artist", http.StatusInternalServerError)
-				return
-			}
-			artists[i].ID = id
-		}
-	}
-
-	post := &posts.Post{Title: title, MediaType: models.MediaType(fileMedia), Filename: header.Filename, Tags: tags, Artists: artists}
+	post := &posts.Post{Title: title, MediaType: models.MediaType(fileMedia), Filename: header.Filename, Tags: allTags}
 	err = h.postSvc.AddPost(r.Context(), post, file, userID)
 	if err != nil {
 		http.Error(w, "Failed to add post", http.StatusInternalServerError)
@@ -203,22 +193,28 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tagMap, err := h.tagSvc.SeperateTagTypes(r.Context(), post.Tags)
+	if err != nil {
+		http.Error(w, "Error handling tags", http.StatusInternalServerError)
+		return
+	}
+
 	path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
 
 	err = h.tmpl.ExecuteTemplate(w, "view.html", struct {
-		Path    string
-		ID      int
-		IsUser  bool
-		IsFav   bool
-		Artists []artists.Artist
-		Tags    []tags.Tag
+		Path   string
+		ID     int
+		IsUser bool
+		IsFav  bool
+		People []tags.Tag
+		Tags   []tags.Tag
 	}{
-		Path:    path,
-		ID:      postID,
-		IsUser:  isUser,
-		IsFav:   isFav,
-		Artists: post.Artists,
-		Tags:    post.Tags,
+		Path:   path,
+		ID:     postID,
+		IsUser: isUser,
+		IsFav:  isFav,
+		People: tagMap[models.TagPeople],
+		Tags:   tagMap[models.TagGeneral],
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)

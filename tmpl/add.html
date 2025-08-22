@@ -13,7 +13,7 @@
       <a href="/">Home</a>
       <a href="/view/posts">View</a>
       <a href="/view/tags">Tags</a>
-      <a href="/view/artists">Artists</a>
+      <a href="/view/people">People</a>
     </div>
     <div class="right">
       <a href="/logout">Logout</a>
@@ -37,8 +37,8 @@
     <label for="file">File: </label>
     <input id="file" name="file" type="file"/><br /><br /><br />
 
-    <label for="artistSelect">Artists: </label>
-    <input id="artistSelect" name="artists"><br />
+    <label for="peopleSelect">People: </label>
+    <input id="peopleSelect" name="people"><br />
 
     <label for="tagSelect">Tags: </label>
     <input id="tagSelect" name="tags"><br />
@@ -52,8 +52,8 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const artistList = [
-        {{- range .ArtistList }}
+      const peopleList = [
+        {{- range .PeopleList }}
         { id: {{.ID}}, value: "{{.Name}}" },
         {{- end }}
       ];
@@ -64,12 +64,16 @@
         {{- end }}
       ];
 
-      new Tagify(document.querySelector('#artistSelect'), {
-        whitelist: artistList,
+      new Tagify(document.querySelector('#peopleSelect'), {
+        whitelist: peopleList,
         enforceWhitelist: false,
         dropdown: {
           enabled: 0,
           maxItems: 20
+        },
+        transformTag: (tagData) => {
+          tagData.type = "{{.PeopleTag}}";
+          return tagData;
         }
       });
 
@@ -79,8 +83,12 @@
         dropdown: {
           enabled: 0,
           maxItems: 20
+        },
+        transformTag: (tagData) => {
+          tagData.type = "{{.GeneralTag}}";
+          return tagData;
         }
-      })
+      });
     });
   </script>
 </body>

@@ -18,8 +18,8 @@ func NewUserHandler(svc *service.UserService, tmpl *template.Template) *UserHand
 }
 
 func (h *UserHandler) DisplayRegister(w http.ResponseWriter, r *http.Request) {
-	username, ok := middleware.GetUserID(r)
-	if ok && username != -1 {
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != 0 {
 		http.Error(w, "Already logged in", http.StatusUnauthorized)
 	}
 

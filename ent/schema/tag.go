@@ -1,7 +1,10 @@
 package schema
 
 import (
+	"goserv/internal/models"
+
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -13,6 +16,11 @@ type Tag struct {
 func (Tag) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").Unique(),
+		field.Enum("tag_type").
+			Values(models.TagType("").Values()...).
+			SchemaType(map[string]string{
+				dialect.Postgres: "tag_type",
+			}),
 	}
 }
 

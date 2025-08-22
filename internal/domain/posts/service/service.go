@@ -111,7 +111,7 @@ func (s *PostService) UnfavouritePost(ctx context.Context, postID int, userID in
 }
 
 func (s *PostService) GetPostWithFavourite(ctx context.Context, postID int, userID int) (*posts.Post, bool, error) {
-	if userID == -1 {
+	if userID == 0 {
 		post, err := s.repo.GetPost(ctx, postID)
 		return post, false, err
 	}

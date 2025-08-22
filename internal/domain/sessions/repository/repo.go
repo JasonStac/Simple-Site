@@ -41,7 +41,7 @@ func (repo *sessionRepo) Logout(ctx context.Context, sessionID string) error {
 func (repo *sessionRepo) GetUserIDBySessionID(ctx context.Context, sessionID string) (int, error) {
 	session, err := repo.client.Session.Query().Where(entSession.IDEQ(sessionID)).Only(ctx)
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 	return session.UserID, nil
 }

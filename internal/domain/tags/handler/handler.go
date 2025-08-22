@@ -30,7 +30,7 @@ func (h *TagHandler) ListTags(w http.ResponseWriter, r *http.Request) {
 
 	isUser := false
 	userID, ok := middleware.GetUserID(r)
-	if ok && userID != -1 {
+	if ok && userID != 0 {
 		isUser = true
 	}
 
@@ -39,6 +39,68 @@ func (h *TagHandler) ListTags(w http.ResponseWriter, r *http.Request) {
 		IsUser bool
 	}{
 		Tags:   response,
+		IsUser: isUser,
+	})
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *TagHandler) ListGeneralTags(w http.ResponseWriter, r *http.Request) {
+	tags, err := h.svc.ListGeneralTags(r.Context())
+	if err != nil {
+		http.Error(w, "Failed to list tags", http.StatusInternalServerError)
+		return
+	}
+
+	response := make([]string, len(tags))
+	for i := range tags {
+		response[i] = tags[i].Name
+	}
+
+	isUser := false
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != 0 {
+		isUser = true
+	}
+
+	err = h.tmpl.ExecuteTemplate(w, "tags.html", struct {
+		Tags   []string
+		IsUser bool
+	}{
+		Tags:   response,
+		IsUser: isUser,
+	})
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *TagHandler) ListPeopleTags(w http.ResponseWriter, r *http.Request) {
+	tags, err := h.svc.ListPeopleTags(r.Context())
+	if err != nil {
+		http.Error(w, "Failed to list tags", http.StatusInternalServerError)
+		return
+	}
+
+	response := make([]string, len(tags))
+	for i := range tags {
+		response[i] = tags[i].Name
+	}
+
+	isUser := false
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != 0 {
+		isUser = true
+	}
+
+	err = h.tmpl.ExecuteTemplate(w, "people.html", struct {
+		People []string
+		IsUser bool
+	}{
+		People: response,
 		IsUser: isUser,
 	})
 	if err != nil {

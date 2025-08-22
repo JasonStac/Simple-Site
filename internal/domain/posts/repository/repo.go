@@ -5,7 +5,6 @@ import (
 	"goserv/ent/gen"
 	entPost "goserv/ent/gen/post"
 	entUser "goserv/ent/gen/user"
-	"goserv/internal/domain/artists"
 	"goserv/internal/domain/posts"
 	"goserv/internal/domain/tags"
 	"goserv/internal/models"
@@ -37,11 +36,6 @@ func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userI
 	for i := range post.Tags {
 		tagIDs[i] = post.Tags[i].ID
 	}
-	artistIDs := make([]int, len(post.Artists))
-	for i := range post.Artists {
-		artistIDs[i] = post.Artists[i].ID
-	}
-	// TODO: look at figuring out proper domain tag/artist into ent tag/artist and using those
 
 	savedPost, err := repo.client.Post.
 		Create().
@@ -50,10 +44,9 @@ func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userI
 		SetFilename(post.Filename).
 		SetOwnerID(userID).
 		AddTagIDs(tagIDs...).
-		AddArtistIDs(artistIDs...).
 		Save(ctx)
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 	return savedPost.ID, nil
 }
@@ -63,7 +56,7 @@ func (repo *postRepository) DeletePost(ctx context.Context, postID int) error {
 }
 
 func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Post, error) {
-	post, err := repo.client.Post.Query().Where(entPost.IDEQ(postID)).WithArtists().WithTags().Only(ctx)
+	post, err := repo.client.Post.Query().Where(entPost.IDEQ(postID)).WithTags().Only(ctx)
 	if err != nil {
 		if gen.IsNotFound(err) {
 			return nil, errors.ErrNotFound
@@ -72,18 +65,11 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 	}
 
 	//TODO: move conversions somewhere else
-	domainArtists := make([]artists.Artist, len(post.Edges.Artists))
-	for i := range post.Edges.Artists {
-		domainArtists[i] = artists.Artist{
-			ID:   post.Edges.Artists[i].ID,
-			Name: post.Edges.Artists[i].Name,
-		}
-	}
-
 	domainTags := make([]tags.Tag, len(post.Edges.Tags))
 	for i := range post.Edges.Tags {
 		domainTags[i] = tags.Tag{
 			ID:   post.Edges.Tags[i].ID,
+			Type: models.TagType(post.Edges.Tags[i].TagType),
 			Name: post.Edges.Tags[i].Name,
 		}
 	}
@@ -95,8 +81,7 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 		Filename:  post.Filename,
 		OwnerID:   post.UserOwns,
 
-		Artists: domainArtists,
-		Tags:    domainTags,
+		Tags: domainTags,
 	}
 	return result, nil
 }
@@ -158,7 +143,6 @@ func (repo *postRepository) GetPostWithFavourite(ctx context.Context, postID int
 	post, err := repo.client.Post.
 		Query().
 		Where(entPost.IDEQ(postID)).
-		WithArtists().
 		WithTags().
 		WithFavouritedBy(func(q *gen.UserQuery) {
 			q.Where(entUser.ID(userID))
@@ -171,19 +155,11 @@ func (repo *postRepository) GetPostWithFavourite(ctx context.Context, postID int
 		return nil, false, err
 	}
 
-	//TODO: move conversions somewhere else
-	domainArtists := make([]artists.Artist, len(post.Edges.Artists))
-	for i := range post.Edges.Artists {
-		domainArtists[i] = artists.Artist{
-			ID:   post.Edges.Artists[i].ID,
-			Name: post.Edges.Artists[i].Name,
-		}
-	}
-
 	domainTags := make([]tags.Tag, len(post.Edges.Tags))
 	for i := range post.Edges.Tags {
 		domainTags[i] = tags.Tag{
 			ID:   post.Edges.Tags[i].ID,
+			Type: models.TagType(post.Edges.Tags[i].TagType),
 			Name: post.Edges.Tags[i].Name,
 		}
 	}
@@ -195,8 +171,7 @@ func (repo *postRepository) GetPostWithFavourite(ctx context.Context, postID int
 		Filename:  post.Filename,
 		OwnerID:   post.UserOwns,
 
-		Artists: domainArtists,
-		Tags:    domainTags,
+		Tags: domainTags,
 	}
 	return result, len(post.Edges.FavouritedBy) > 0, nil
 }

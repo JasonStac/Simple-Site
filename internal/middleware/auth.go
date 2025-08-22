@@ -30,12 +30,12 @@ func AuthRestrictMiddleware(sessionRepo repository.Session) func(http.Handler) h
 func AuthCheckMiddleware(sessionRepo repository.Session) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			userID := -1
+			userID := 0
 			cookie, err := r.Cookie("id")
 			if err == nil {
 				userID, err = sessionRepo.GetUserIDBySessionID(r.Context(), cookie.Value)
 				if err != nil {
-					userID = -1
+					userID = 0
 				}
 			}
 

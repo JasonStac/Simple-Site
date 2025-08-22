@@ -13,7 +13,7 @@
       <a href="/">Home</a>
       <a class="active" href="/view/posts">View</a>
       <a href="/view/tags">Tags</a>
-      <a href="/view/artists">Artists</a>
+      <a href="/view/people">People</a>
     </div>
     <div class="right">
       {{if .IsUser}}
@@ -31,8 +31,8 @@
   <section>
     <div>
       <p style="color: white;">
-        <b>Artists:</b>
-        {{range .Artists}}
+        <b>People:</b>
+        {{range .People}}
         {{.Name}} <!--TODO: add bubble styles around each name-->
         {{end}}
       </p>

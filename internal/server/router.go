@@ -1,7 +1,6 @@
 package server
 
 import (
-	artistHandler "goserv/internal/domain/artists/handler"
 	postHandler "goserv/internal/domain/posts/handler"
 	sessionHandler "goserv/internal/domain/sessions/handler"
 	tagHandler "goserv/internal/domain/tags/handler"
@@ -14,7 +13,6 @@ import (
 )
 
 func (s *Server) initRoutes(
-	artistHandler *artistHandler.ArtistHandler,
 	tagHandler *tagHandler.TagHandler,
 	postHandler *postHandler.PostHandler,
 	userHandler *userHandler.UserHandler,
@@ -28,7 +26,7 @@ func (s *Server) initRoutes(
 		func(w http.ResponseWriter, r *http.Request) {
 			isUser := false
 			userID, ok := middleware.GetUserID(r)
-			if ok && userID != -1 {
+			if ok && userID != 0 {
 				isUser = true
 			}
 
@@ -52,8 +50,8 @@ func (s *Server) initRoutes(
 	s.router.With(checkMiddleware).Route("/view", func(r chi.Router) {
 		r.Get("/posts", postHandler.ListPosts)
 		r.Mount("/posts/", routeSinglePosts(postHandler))
-		r.Get("/tags", tagHandler.ListTags)
-		r.Get("/artists", artistHandler.ListArtists)
+		r.Get("/tags", tagHandler.ListGeneralTags)
+		r.Get("/people", tagHandler.ListPeopleTags)
 	})
 
 	s.router.With(authMiddleware).Route("/profile", func(r chi.Router) {

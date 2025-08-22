@@ -11,7 +11,7 @@
       <a href="/">Home</a>
       <a href="/view/posts">View</a>
       <a href="/view/tags">Tags</a>
-      <a class="active" href="/view/artists">Artists</a>
+      <a class="active" href="/view/people">People</a>
     </div>
     <div class="right">
       {{if .IsUser}}
@@ -24,10 +24,10 @@
     </div>
   </div>
 
-  <h1>Artists</h1>
+  <h1>People</h1>
 
   <div>
-    {{range .Artists}}
+    {{range .People}}
       <p>{{.}}</p>
     {{end}}
   </div>

@@ -1,7 +1,6 @@
 package posts
 
 import (
-	"goserv/internal/domain/artists"
 	"goserv/internal/domain/tags"
 	"goserv/internal/models"
 )
@@ -13,6 +12,5 @@ type Post struct {
 	Filename  string
 	OwnerID   int
 
-	Artists []artists.Artist
-	Tags    []tags.Tag
+	Tags []tags.Tag
 }

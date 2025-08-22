@@ -19,8 +19,8 @@ func NewSessionHandler(svc *service.SessionService, tmpl *template.Template) *Se
 }
 
 func (h *SessionHandler) DisplayLogin(w http.ResponseWriter, r *http.Request) {
-	username, ok := middleware.GetUserID(r)
-	if ok && username != -1 {
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != 0 {
 		http.Error(w, "Already logged in", http.StatusUnauthorized)
 		return
 	}

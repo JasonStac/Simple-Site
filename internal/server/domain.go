@@ -1,9 +1,6 @@
 package server
 
 import (
-	artistHandler "goserv/internal/domain/artists/handler"
-	artistRepo "goserv/internal/domain/artists/repository"
-	artistService "goserv/internal/domain/artists/service"
 	postHandler "goserv/internal/domain/posts/handler"
 	postRepo "goserv/internal/domain/posts/repository"
 	postService "goserv/internal/domain/posts/service"
@@ -19,27 +16,23 @@ import (
 )
 
 func (s *Server) initDomain() {
-	postHandler, tagHandler, artistHandler := s.initContent()
+	postHandler, tagHandler := s.initContent()
 	userHandler, sessionHandler := s.initAuth()
 
-	s.initRoutes(artistHandler, tagHandler, postHandler, userHandler, sessionHandler)
+	s.initRoutes(tagHandler, postHandler, userHandler, sessionHandler)
 }
 
-func (s *Server) initContent() (*postHandler.PostHandler, *tagHandler.TagHandler, *artistHandler.ArtistHandler) {
+func (s *Server) initContent() (*postHandler.PostHandler, *tagHandler.TagHandler) {
 	tRepo := tagRepo.NewTagRepository(s.ent)
 	tService := tagService.NewTagService(tRepo)
 	tHandler := tagHandler.NewTagHandler(tService, s.tmplCache)
 
-	aRepo := artistRepo.NewArtistRepository(s.ent)
-	aService := artistService.NewArtistService(aRepo)
-	aHandler := artistHandler.NewArtistHandler(aService, s.tmplCache)
-
 	pRepo := postRepo.NewPostRepository(s.ent)
 	pService := postService.NewPostService(pRepo)
-	pHandler := postHandler.NewPostHandler(pService, tService, aService, s.tmplCache)
+	pHandler := postHandler.NewPostHandler(pService, tService, s.tmplCache)
 	s.post = pRepo
 
-	return pHandler, tHandler, aHandler
+	return pHandler, tHandler
 }
 
 func (s *Server) initAuth() (*userHandler.UserHandler, *sessionHandler.SessionHandler) {

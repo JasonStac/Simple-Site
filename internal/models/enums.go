@@ -17,3 +17,17 @@ func (MediaType) Values() []string {
 		string(MediaBook),
 	}
 }
+
+type TagType string
+
+const (
+	TagGeneral TagType = "General"
+	TagPeople  TagType = "People"
+)
+
+func (TagType) Values() []string {
+	return []string{
+		string(TagGeneral),
+		string(TagPeople),
+	}
+}
