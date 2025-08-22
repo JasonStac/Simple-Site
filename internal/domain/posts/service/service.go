@@ -105,3 +105,15 @@ func (s *PostService) DeletePost(ctx context.Context, postID int, filepath strin
 func (s *PostService) FavouritePost(ctx context.Context, postID int, userID int) error {
 	return s.repo.FavouritePost(ctx, postID, userID)
 }
+
+func (s *PostService) UnfavouritePost(ctx context.Context, postID int, userID int) error {
+	return s.repo.UnfavouritePost(ctx, postID, userID)
+}
+
+func (s *PostService) GetPostWithFavourite(ctx context.Context, postID int, userID int) (*posts.Post, bool, error) {
+	if userID == -1 {
+		post, err := s.repo.GetPost(ctx, postID)
+		return post, false, err
+	}
+	return s.repo.GetPostWithFavourite(ctx, postID, userID)
+}

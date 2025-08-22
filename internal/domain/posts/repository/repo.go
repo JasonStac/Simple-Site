@@ -20,6 +20,8 @@ type Post interface {
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
 	ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error)
 	FavouritePost(ctx context.Context, postID int, userID int) error
+	UnfavouritePost(ctx context.Context, postID int, userID int) error
+	GetPostWithFavourite(ctx context.Context, postID int, userID int) (*posts.Post, bool, error)
 }
 
 type postRepository struct {
@@ -146,4 +148,55 @@ func (repo *postRepository) ListUserFavs(ctx context.Context, userID int) ([]pos
 
 func (repo *postRepository) FavouritePost(ctx context.Context, postID int, userID int) error {
 	return repo.client.User.UpdateOneID(userID).AddFavouriteIDs(postID).Exec(ctx)
+}
+
+func (repo *postRepository) UnfavouritePost(ctx context.Context, postID int, userID int) error {
+	return repo.client.User.UpdateOneID(userID).RemoveFavouriteIDs(postID).Exec(ctx)
+}
+
+func (repo *postRepository) GetPostWithFavourite(ctx context.Context, postID int, userID int) (*posts.Post, bool, error) {
+	post, err := repo.client.Post.
+		Query().
+		Where(entPost.IDEQ(postID)).
+		WithArtists().
+		WithTags().
+		WithFavouritedBy(func(q *gen.UserQuery) {
+			q.Where(entUser.ID(userID))
+		}).
+		Only(ctx)
+	if err != nil {
+		if gen.IsNotFound(err) {
+			return nil, false, errors.ErrNotFound
+		}
+		return nil, false, err
+	}
+
+	//TODO: move conversions somewhere else
+	domainArtists := make([]artists.Artist, len(post.Edges.Artists))
+	for i := range post.Edges.Artists {
+		domainArtists[i] = artists.Artist{
+			ID:   post.Edges.Artists[i].ID,
+			Name: post.Edges.Artists[i].Name,
+		}
+	}
+
+	domainTags := make([]tags.Tag, len(post.Edges.Tags))
+	for i := range post.Edges.Tags {
+		domainTags[i] = tags.Tag{
+			ID:   post.Edges.Tags[i].ID,
+			Name: post.Edges.Tags[i].Name,
+		}
+	}
+
+	result := &posts.Post{
+		ID:        post.ID,
+		Title:     post.Title,
+		MediaType: models.MediaType(post.MediaType),
+		Filename:  post.Filename,
+		OwnerID:   post.UserOwns,
+
+		Artists: domainArtists,
+		Tags:    domainTags,
+	}
+	return result, len(post.Edges.FavouritedBy) > 0, nil
 }

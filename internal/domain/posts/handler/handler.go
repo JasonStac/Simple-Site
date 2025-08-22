@@ -187,7 +187,13 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := h.postSvc.GetPost(r.Context(), postID)
+	isUser := false
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != -1 {
+		isUser = true
+	}
+
+	post, isFav, err := h.postSvc.GetPostWithFavourite(r.Context(), postID, userID)
 	if err != nil {
 		if errors.Is(err, myErrors.ErrNotFound) {
 			http.NotFound(w, r)
@@ -199,22 +205,18 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 
 	path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
 
-	userID, ok := middleware.GetUserID(r)
-	isUser := false
-	if !ok && userID != -1 {
-		isUser = true
-	}
-
 	err = h.tmpl.ExecuteTemplate(w, "view.html", struct {
 		Path    string
 		ID      int
 		IsUser  bool
+		IsFav   bool
 		Artists []artists.Artist
 		Tags    []tags.Tag
 	}{
 		Path:    path,
 		ID:      postID,
 		IsUser:  isUser,
+		IsFav:   isFav,
 		Artists: post.Artists,
 		Tags:    post.Tags,
 	})
@@ -320,6 +322,26 @@ func (h *PostHandler) FavouritePost(w http.ResponseWriter, r *http.Request) {
 	err = h.postSvc.FavouritePost(r.Context(), postID, userID)
 	if err != nil {
 		http.Error(w, "Error favouriting post", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *PostHandler) UnfavouritePost(w http.ResponseWriter, r *http.Request) {
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		http.Error(w, "Error reading user id", http.StatusBadRequest)
+		return
+	}
+
+	postID, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		http.Error(w, "Error getting post id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.postSvc.UnfavouritePost(r.Context(), postID, userID)
+	if err != nil {
+		http.Error(w, "Error unfavouriting post", http.StatusInternalServerError)
 		return
 	}
 }

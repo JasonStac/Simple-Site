@@ -45,17 +45,26 @@
     </div>
     <!--TODO: add button for displaying full size image-->
     <div class="image-box" style="justify-content: center;">
-      <button onclick="favouritePost('{{.ID}}', this)" class="btn favourite">Favourite</button>
+      {{if .IsUser}}
+        {{if .IsFav}}
+          <button onclick="favouritePost('{{.ID}}', this)" class="btn favourite" data-fav="true">Unfavourite</button>
+        {{else}}
+          <button onclick="favouritePost('{{.ID}}', this)" class="btn favourite" data-fav="false">Favourite</button>
+        {{end}}
+      {{end}}
       <img style="max-width: 850px; max-height: 700px" src="/assets/images/{{.Path}}" alt="Image"> <!--TODO: update when multiple content types implemented-->
     </div>
     </div>
   </section>
   <script>
     function favouritePost(value, btn) {
+      const isFav = btn.dataset.fav === "true";
+      const url = isFav ? "/favourite" : "/unfavourite";
+
       const params = new URLSearchParams();
       params.append("id", value);
 
-      fetch("/favourite", {
+      fetch(url, {
         method: "POST",
         headers: {
           "Content-type": "application/x-www-form-urlencoded"
@@ -64,7 +73,8 @@
       })
       .then(res => {
         if (res.ok) {
-          btn.textContent = "Unfavourite";
+          btn.textContent = isFav ? "Unfavourite" : "Favourite";
+          btn.dataset.fav = (!isFav).toString();
         }
       })
       .catch(err => {
