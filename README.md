@@ -5,14 +5,14 @@ A simple image board style site to practice various parts of web development. Du
 With most of my current experience being in systems level development, I wanted to try gaining some practical experience in web development and decided to make a simple website. Having my own catalogue of pictures from vacations and other memories, I figured making an image board style site could help me learn skills that carry over into structuring them in a more accessible, tag-based file structure.
 
 # Tools Used
-Currently, I've used Go with [ent](https://github.com/ent/ent) + [chi](https://github.com/go-chi/chi) for the backend, while having static HTML files served with some CSS and js attached. I'm also currently using [Tagify](https://github.com/yairEO/tagify) for selecting artists and tags for a post. I'm also using a PostgreSQL database.
+Currently, I've used Go with [ent](https://github.com/ent/ent) + [chi](https://github.com/go-chi/chi) for the backend, while having static HTML files served with some CSS and js attached. I'm also currently using [Tagify](https://github.com/yairEO/tagify) for selecting people and tags for a post. I'm also using a PostgreSQL database.
 
 # Current Features
   - [x] Support for posts to contain image data
   - [x] Navigation bar
   - [x] Viewing a list of all posts
   - [x] Viewing a list of all tags
-  - [x] Viewing a list of all artists
+  - [x] Viewing a list of all people
   - [x] Registering an account
   - [x] Confirming passwords entered in fields both match
   - [x] Hashing password with bcrypt to store hash instead of plain password in database
@@ -21,13 +21,13 @@ Currently, I've used Go with [ent](https://github.com/ent/ent) + [chi](https://g
   - [x] Adding posts when logged in
   - [x] Viewing uploads when logged in
   - [x] Viewing favourited posts when logged in
+  - [x] Favouriting posts
+  - [x] Deleting uploads
 
 # Planned Features
 Currently planned future features include:
   - Support for posts to contain audio, video, and book/compilation data
-  - The ability to favourite posts
   - The ability to download posts
-  - The ability to delete your own posts
   - The ability to update your own posts
   - Adding timeouts for sessions in both cookie and database
   - The ability to filter posts by search on titles
@@ -56,14 +56,18 @@ POST  /logout              /internal/domain/session/handler/handler@Logout
 
 GET   /view/posts          /internal/domain/post/handler/handler@ListPosts
 GET   /view/posts/{id}     /internal/domain/post/handler/handler@ViewPost
-GET   /view/tags           /internal/domain/tag/handler/handler@ListTags
-GET   /view/artists        /internal/domain/artist/handler/handler@ListArtists
+GET   /view/tags           /internal/domain/tag/handler/handler@ListGeneralTags
+GET   /view/people         /internal/domain/tag/handler/handler@ListPeopleTags
 
 GET   /profile             /internal/domain/user/handler/handler@Profile
 GET   /profile/create      /internal/domain/post/handelr/handler@ViewAddPost
 POST  /profile/create      /internal/domain/post/handler/handler@AddPost
 GET   /profile/uploads     /internal/domain/post/handler/handler@ListUserPosts
 GET   /profile/favourites  /internal/domain/post/handler/handler@ListUserFavs
+
+POST  /delete              /internal/domain/post/handler/handler@DeletePost
+POST  /favourite           /internal/domain/post/handler/handler@FavouritePost
+POST  /unfavourite         /internal/domain/post/handler/handler@UnfavouritePost
 ```
 
 # Display
