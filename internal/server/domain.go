@@ -26,6 +26,7 @@ func (s *Server) initContent() (*postHandler.PostHandler, *tagHandler.TagHandler
 	tRepo := tagRepo.NewTagRepository(s.ent)
 	tService := tagService.NewTagService(tRepo)
 	tHandler := tagHandler.NewTagHandler(tService, s.tmplCache)
+	s.tag = tRepo
 
 	pRepo := postRepo.NewPostRepository(s.ent)
 	pService := postService.NewPostService(pRepo)

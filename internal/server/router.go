@@ -23,6 +23,7 @@ func (s *Server) initRoutes(
 	authMiddleware := middleware.AuthRestrictMiddleware(s.session)
 	checkMiddleware := middleware.AuthCheckMiddleware(s.session)
 	deleteMiddleware := middleware.DeleteMiddleware(s.user, s.post)
+	newTagMiddleware := middleware.AddNewTags(s.tag)
 
 	s.router.With(checkMiddleware).Get("/",
 		func(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +60,7 @@ func (s *Server) initRoutes(
 	s.router.With(authMiddleware).Route("/profile", func(r chi.Router) {
 		r.Get("/", userHandler.Profile)
 		r.Get("/create", postHandler.ViewAddPost)
-		r.Post("/create", postHandler.AddPost)
+		r.With(newTagMiddleware).Post("/create", postHandler.AddPost)
 		r.Get("/uploads", postHandler.ListUserPosts)
 		//r.Mount("/uploads/", routeSingleUploads(postHandler))
 		r.Get("/favourites", postHandler.ListUserFavs)

@@ -6,6 +6,7 @@ import (
 	"goserv/internal/database"
 	pRepo "goserv/internal/domain/posts/repository"
 	sRepo "goserv/internal/domain/sessions/repository"
+	tRepo "goserv/internal/domain/tags/repository"
 	uRepo "goserv/internal/domain/users/repository"
 	"goserv/pkg/config"
 	"goserv/pkg/templates"
@@ -30,6 +31,7 @@ type Server struct {
 	user    uRepo.User
 	session sRepo.Session
 	post    pRepo.Post
+	tag     tRepo.Tag
 
 	router *chi.Mux
 

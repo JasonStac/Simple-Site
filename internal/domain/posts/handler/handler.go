@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
 	"goserv/internal/domain/posts"
 	pService "goserv/internal/domain/posts/service"
@@ -93,37 +92,13 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	jsonGeneralTags := r.FormValue("tags")
-	var generalTags []tags.Tag
-	if jsonGeneralTags != "" {
-		if err := json.Unmarshal([]byte(jsonGeneralTags), &generalTags); err != nil {
-			http.Error(w, "Failed to read tags", http.StatusBadRequest)
-			return
-		}
+	tags, ok := middleware.GetTags(r)
+	if !ok {
+		http.Error(w, "Error reading tags", http.StatusInternalServerError)
+		return
 	}
 
-	jsonPeopleTags := r.FormValue("people")
-	var peopleTags []tags.Tag
-	if jsonPeopleTags != "" {
-		if err := json.Unmarshal([]byte(jsonPeopleTags), &peopleTags); err != nil {
-			http.Error(w, "Failed to read people", http.StatusBadRequest)
-			return
-		}
-	}
-
-	allTags := append(generalTags, peopleTags...)
-	for i := range allTags {
-		if allTags[i].ID == 0 {
-			id, err := h.tagSvc.AddTag(r.Context(), allTags[i].Name, models.TagType(allTags[i].Type))
-			if err != nil {
-				http.Error(w, "Failed to add tag", http.StatusInternalServerError)
-				return
-			}
-			allTags[i].ID = id
-		}
-	}
-
-	post := &posts.Post{Title: title, MediaType: models.MediaType(fileMedia), Filename: header.Filename, Tags: allTags}
+	post := &posts.Post{Title: title, MediaType: models.MediaType(fileMedia), Filename: header.Filename, Tags: tags}
 	err = h.postSvc.AddPost(r.Context(), post, file, userID)
 	if err != nil {
 		http.Error(w, "Failed to add post", http.StatusInternalServerError)
