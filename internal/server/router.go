@@ -8,6 +8,8 @@ import (
 	"goserv/internal/middleware"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -68,7 +70,8 @@ func (s *Server) initRoutes(
 	s.router.With(authMiddleware).Post("/unfavourite", postHandler.UnfavouritePost)
 
 	s.router.Mount("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
-	s.router.Mount("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("content"))))
+	//s.router.Mount("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("content"))))
+	s.router.Mount("/assets/images/", routeFileServe())
 
 	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("404 Not Found: %s\n", r.URL.Path)
@@ -81,6 +84,30 @@ func routeSinglePosts(postHandler *postHandler.PostHandler) http.HandlerFunc {
 		switch r.Method {
 		case http.MethodGet:
 			postHandler.ViewPost(w, r)
+		default:
+			http.Error(w, "Unsupported status method", http.StatusMethodNotAllowed)
+		}
+	}
+}
+
+func routeFileServe() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			filename, ok := strings.CutPrefix(r.URL.Path, "/assets/images/")
+			if !ok {
+				http.NotFound(w, r)
+				return
+			}
+
+			if len(filename) < 74 {
+				http.NotFound(w, r)
+				return
+			}
+
+			title := filename[70:]
+			w.Header().Set("Content-Disposition", "attachment; filename="+title)
+			http.ServeFile(w, r, filepath.Join("content", filename))
 		default:
 			http.Error(w, "Unsupported status method", http.StatusMethodNotAllowed)
 		}

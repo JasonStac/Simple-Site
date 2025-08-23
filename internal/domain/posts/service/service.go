@@ -47,7 +47,7 @@ func (s *PostService) AddPost(ctx context.Context, post *posts.Post, content mul
 	dir1 := hashHex[0:2]
 	dir2 := hashHex[2:4]
 	finalDir := filepath.Join("content", dir1, dir2)
-	finalName := hashHex + ext
+	finalName := hashHex + post.Title + ext
 	finalPath := filepath.Join(finalDir, finalName)
 	/////move to seperate function
 

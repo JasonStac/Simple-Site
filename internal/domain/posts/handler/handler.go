@@ -9,13 +9,12 @@ import (
 	tService "goserv/internal/domain/tags/service"
 	"goserv/internal/middleware"
 	"goserv/internal/models"
-	"goserv/internal/utils"
 	myErrors "goserv/internal/utils/errors"
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 	"strconv"
+	"strings"
 )
 
 type ResponseEntry struct {
@@ -95,7 +94,6 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	jsonGeneralTags := r.FormValue("tags")
-	log.Printf("All general: %s\n\n", jsonGeneralTags)
 	var generalTags []tags.Tag
 	if jsonGeneralTags != "" {
 		if err := json.Unmarshal([]byte(jsonGeneralTags), &generalTags); err != nil {
@@ -105,7 +103,6 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonPeopleTags := r.FormValue("people")
-	log.Printf("All people: %s\n\n", jsonPeopleTags)
 	var peopleTags []tags.Tag
 	if jsonPeopleTags != "" {
 		if err := json.Unmarshal([]byte(jsonPeopleTags), &peopleTags); err != nil {
@@ -171,7 +168,7 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
-	postID, err := utils.GetPostIDFromPath(r.URL.Path)
+	postID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/view/posts/"))
 	if err != nil {
 		http.NotFound(w, r)
 		return

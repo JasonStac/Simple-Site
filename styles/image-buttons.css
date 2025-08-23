@@ -13,6 +13,11 @@
   border: none;
   cursor: pointer;
   font-weight: bold;
+  font-size: 150%;
+  text-decoration: none;
+  font-family: "Geneva";
+  text-align: center;
+  display: inline-block;
 }
 
 .btn.delete {
@@ -21,4 +26,8 @@
 
 .btn.favourite {
   background: deeppink;
+}
+
+.btn.download {
+  background: darkcyan;
 }
