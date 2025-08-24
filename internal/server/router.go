@@ -14,6 +14,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+const fileHashLen = 64
+
 func (s *Server) initRoutes(
 	tagHandler *tagHandler.TagHandler,
 	postHandler *postHandler.PostHandler,
@@ -71,8 +73,9 @@ func (s *Server) initRoutes(
 	s.router.With(authMiddleware).Post("/unfavourite", postHandler.UnfavouritePost)
 
 	s.router.Mount("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
-	//s.router.Mount("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir("content"))))
-	s.router.Mount("/assets/images/", routeFileServe())
+	//s.router.Mount("/assets/content/", http.StripPrefix("/assets/content/", http.FileServer(http.Dir("content"))))
+	s.router.Mount("/assets/content/", routeContentServe())
+	s.router.Mount("/assets/thumbnail/", routeThumbnailServe())
 
 	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("404 Not Found: %s\n", r.URL.Path)
@@ -91,26 +94,50 @@ func routeSinglePosts(postHandler *postHandler.PostHandler) http.HandlerFunc {
 	}
 }
 
-func routeFileServe() http.HandlerFunc {
+func routeContentServe() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			filename, ok := strings.CutPrefix(r.URL.Path, "/assets/images/")
+			filename, ok := strings.CutPrefix(r.URL.Path, "/assets/content/")
 			if !ok {
 				http.NotFound(w, r)
 				return
 			}
 
-			if len(filename) < 74 {
+			if len(filename) < fileHashLen+len(".ext") {
 				http.NotFound(w, r)
 				return
 			}
 
-			title := filename[70:]
+			title := filename[fileHashLen:]
 			w.Header().Set("Content-Disposition", "attachment; filename="+title)
-			http.ServeFile(w, r, filepath.Join("content", filename))
+			http.ServeFile(w, r, filepath.Join("content", filename[0:2], filename[2:4], filename))
 		default:
 			http.Error(w, "Unsupported status method", http.StatusMethodNotAllowed)
+		}
+	}
+}
+
+func routeThumbnailServe() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			filename, ok := strings.CutPrefix(r.URL.Path, "/assets/thumbnail/")
+			if !ok {
+				http.Error(w, "bad prefix", http.StatusNotFound)
+				return
+			}
+
+			if len(filename) < fileHashLen+len(".ext") {
+				http.Error(w, "bad file length", http.StatusNotFound)
+				return
+			}
+
+			title := filename[fileHashLen:]
+			w.Header().Set("Content-Disposition", "attachment; filename="+title)
+			http.ServeFile(w, r, filepath.Join("thumbnail", filename[0:2], filename[2:4], filename))
+		default:
+			http.Error(w, "bad method", http.StatusMethodNotAllowed)
 		}
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"goserv/internal/domain/tags"
 	"goserv/internal/domain/tags/repository"
-	"goserv/internal/models"
+	"goserv/internal/static/enum"
 	"net/http"
 )
 
@@ -33,7 +33,7 @@ func AddNewTags(repo repository.Tag) func(http.Handler) http.Handler {
 			allTags := append(generalTags, peopleTags...)
 			for i := range allTags {
 				if allTags[i].ID == 0 {
-					id, err := repo.AddTag(r.Context(), allTags[i].Name, models.TagType(allTags[i].Type))
+					id, err := repo.AddTag(r.Context(), allTags[i].Name, enum.TagType(allTags[i].Type))
 					if err != nil {
 						http.Error(w, "Failed to add tag", http.StatusInternalServerError)
 						return

@@ -1,7 +1,7 @@
 package schema
 
 import (
-	"goserv/internal/models"
+	"goserv/internal/static/enum"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -17,11 +17,12 @@ func (Post) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("title"),
 		field.Enum("media_type").
-			Values(models.MediaType("").Values()...).
+			Values(enum.MediaType("").Values()...).
 			SchemaType(map[string]string{
 				dialect.Postgres: "media_type",
 			}),
 		field.String("filename").Unique(),
+		field.String("file_ext"),
 		field.Int("user_owns").Optional(),
 	}
 }

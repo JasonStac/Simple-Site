@@ -2,14 +2,15 @@ package posts
 
 import (
 	"goserv/internal/domain/tags"
-	"goserv/internal/models"
+	"goserv/internal/static/enum"
 )
 
 type Post struct {
 	ID        int
 	Title     string
-	MediaType models.MediaType
+	MediaType enum.MediaType
 	Filename  string
+	FileExt   string
 	OwnerID   int
 
 	Tags []tags.Tag

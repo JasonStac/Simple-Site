@@ -8,7 +8,8 @@ import (
 type key string
 
 const userKey key = "user_id"
-const filepathKey key = "filepath"
+const filenameKey key = "filename"
+const fileExtKey key = "file_ext"
 const postKey key = "post_id"
 const tagKey key = "tags"
 
@@ -17,9 +18,10 @@ func GetUserID(r *http.Request) (int, bool) {
 	return userID, ok
 }
 
-func GetFilepath(r *http.Request) (string, bool) {
-	filepath, ok := r.Context().Value(filepathKey).(string)
-	return filepath, ok
+func GetCompleteFilename(r *http.Request) (string, string, bool) {
+	filename, ok1 := r.Context().Value(filenameKey).(string)
+	fileExt, ok2 := r.Context().Value(fileExtKey).(string)
+	return filename, fileExt, ok1 && ok2
 }
 
 func GetPostID(r *http.Request) (int, bool) {

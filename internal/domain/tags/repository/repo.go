@@ -5,11 +5,11 @@ import (
 	"goserv/ent/gen"
 	entTag "goserv/ent/gen/tag"
 	"goserv/internal/domain/tags"
-	"goserv/internal/models"
+	"goserv/internal/static/enum"
 )
 
 type Tag interface {
-	AddTag(ctx context.Context, name string, tagType models.TagType) (int, error)
+	AddTag(ctx context.Context, name string, tagType enum.TagType) (int, error)
 	ListTags(ctx context.Context) ([]tags.Tag, error)
 	ListGeneralTags(ctx context.Context) ([]tags.Tag, error)
 	ListPeopleTags(ctx context.Context) ([]tags.Tag, error)
@@ -23,7 +23,7 @@ func NewTagRepository(client *gen.Client) *tagRepository {
 	return &tagRepository{client: client}
 }
 
-func (repo *tagRepository) AddTag(ctx context.Context, name string, tagType models.TagType) (int, error) {
+func (repo *tagRepository) AddTag(ctx context.Context, name string, tagType enum.TagType) (int, error) {
 	entTag, err := repo.client.Tag.Create().SetName(name).SetTagType(entTag.TagType(tagType)).Save(ctx)
 	if err != nil {
 		return 0, err
@@ -37,7 +37,7 @@ func (repo *tagRepository) ListTags(ctx context.Context) ([]tags.Tag, error) {
 	for i := range entTags {
 		returnTags[i] = tags.Tag{
 			ID:   entTags[i].ID,
-			Type: models.TagType(entTags[i].TagType),
+			Type: enum.TagType(entTags[i].TagType),
 			Name: entTags[i].Name,
 		}
 	}
@@ -53,7 +53,7 @@ func (repo *tagRepository) ListGeneralTags(ctx context.Context) ([]tags.Tag, err
 	for i := range entTags {
 		returnTags[i] = tags.Tag{
 			ID:   entTags[i].ID,
-			Type: models.TagGeneral,
+			Type: enum.TagGeneral,
 			Name: entTags[i].Name,
 		}
 	}
@@ -69,7 +69,7 @@ func (repo *tagRepository) ListPeopleTags(ctx context.Context) ([]tags.Tag, erro
 	for i := range entTags {
 		returnTags[i] = tags.Tag{
 			ID:   entTags[i].ID,
-			Type: models.TagPeople,
+			Type: enum.TagPeople,
 			Name: entTags[i].Name,
 		}
 	}

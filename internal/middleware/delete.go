@@ -5,7 +5,6 @@ import (
 	pRepo "goserv/internal/domain/posts/repository"
 	uRepo "goserv/internal/domain/users/repository"
 	"net/http"
-	"path/filepath"
 	"strconv"
 )
 
@@ -30,7 +29,8 @@ func DeleteMiddleware(userRepo uRepo.User, postRepo pRepo.Post) func(http.Handle
 				http.Error(w, "Error deleting", http.StatusInternalServerError)
 				return
 			}
-			ctx = context.WithValue(ctx, filepathKey, filepath.Join("content", post.Filename[0:2], post.Filename[2:4], post.Filename))
+			ctx = context.WithValue(ctx, filenameKey, post.Filename)
+			ctx = context.WithValue(ctx, fileExtKey, post.FileExt)
 
 			isAdmin, err := userRepo.IsAdmin(r.Context(), userID)
 			if err != nil {

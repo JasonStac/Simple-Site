@@ -4,8 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"goserv/internal/domain/posts"
 	"goserv/internal/domain/posts/repository"
+	"goserv/internal/static/constant"
+	"goserv/internal/static/enum"
+	"goserv/internal/utils"
 	"io"
 	"log"
 	"mime/multipart"
@@ -43,19 +47,18 @@ func (s *PostService) AddPost(ctx context.Context, post *posts.Post, content mul
 	hashBytes := hasher.Sum(nil)
 	hashHex := hex.EncodeToString(hashBytes)
 	ext := strings.ToLower(filepath.Ext(post.Filename))
+	//TODO: add extension validation based on content type
 
-	dir1 := hashHex[0:2]
-	dir2 := hashHex[2:4]
-	finalDir := filepath.Join("content", dir1, dir2)
-	finalName := hashHex + post.Title + ext
-	finalPath := filepath.Join(finalDir, finalName)
-	/////move to seperate function
+	finalDir := filepath.Join("content", hashHex[0:2], hashHex[2:4])
+	finalName := hashHex + post.Title
+	finalPath := filepath.Join(finalDir, finalName+ext)
 
 	if err := os.MkdirAll(finalDir, 0755); err != nil {
 		return err
 	}
 
 	post.Filename = finalName
+	post.FileExt = ext
 	postID, err := s.repo.AddPost(ctx, post, userID)
 	if err != nil {
 		return err
@@ -69,7 +72,32 @@ func (s *PostService) AddPost(ctx context.Context, post *posts.Post, content mul
 		return err
 	}
 
+	switch post.MediaType {
+	case enum.MediaImage:
+		if err := utils.CreateImageThumbnail(finalDir, finalName, ext); err != nil {
+			s.cleanupBadAdd(ctx, postID, finalPath)
+			return err
+		}
+	case enum.MediaVideo:
+		if err := utils.ExctractVideoThumbnail(finalName, ext); err != nil {
+			s.cleanupBadAdd(ctx, postID, finalPath)
+			return err
+		}
+	case enum.MediaAudio, enum.MediaBook:
+	default:
+		s.cleanupBadAdd(ctx, postID, finalPath)
+		return errors.New("invalid media type")
+	}
 	return nil
+}
+
+func (s *PostService) cleanupBadAdd(ctx context.Context, postID int, path string) {
+	if dbErr := s.repo.DeletePost(ctx, postID); dbErr != nil {
+		log.Printf("Error deleting post from db, %v\n", dbErr)
+	}
+	if osErr := os.Remove(path); osErr != nil {
+		log.Printf("Error deleting file: %s, %v\n", path, osErr)
+	}
 }
 
 func (s *PostService) GetPost(ctx context.Context, postID int) (*posts.Post, error) {
@@ -88,16 +116,21 @@ func (s *PostService) ListUserFavs(ctx context.Context, userID int) ([]posts.Pos
 	return s.repo.ListUserFavs(ctx, userID)
 }
 
-func (s *PostService) DeletePost(ctx context.Context, postID int, filepath string) error {
+func (s *PostService) DeletePost(ctx context.Context, postID int, filename string, fileExt string) error {
 	err := s.repo.DeletePost(ctx, postID)
 	if err != nil {
 		return err
 	}
 
-	err = os.Remove(filepath)
+	dataPath := filepath.Join(filename[0:2], filename[2:4], filename)
+	err = os.Remove(filepath.Join("content", dataPath+fileExt))
 	if err != nil {
-		log.Printf("Failed to remove file during delete for file: %s\n", filepath)
-		return nil
+		log.Printf("Failed to remove content file during delete for data: %s, %v\n", dataPath, err)
+	}
+
+	err = os.Remove(filepath.Join("thumbnail", dataPath+constant.ThumbnailExt))
+	if err != nil {
+		log.Printf("Failed to remove thumbnail file during delete for data: %s, %v\n", dataPath, err)
 	}
 	return nil
 }

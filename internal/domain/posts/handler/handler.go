@@ -7,18 +7,19 @@ import (
 	"goserv/internal/domain/tags"
 	tService "goserv/internal/domain/tags/service"
 	"goserv/internal/middleware"
-	"goserv/internal/models"
+	"goserv/internal/static/constant"
+	"goserv/internal/static/enum"
 	myErrors "goserv/internal/utils/errors"
 	"html/template"
 	"net/http"
-	"path"
 	"strconv"
 	"strings"
 )
 
 type ResponseEntry struct {
-	Path string
-	ID   int
+	Filename string
+	FileExt  string
+	ID       int
 }
 
 type PostHandler struct {
@@ -59,9 +60,9 @@ func (h *PostHandler) ViewAddPost(w http.ResponseWriter, r *http.Request) {
 		TagList    []tags.Tag
 		PeopleList []tags.Tag
 	}{
-		MediaTypes: models.MediaType("").Values(),
-		GeneralTag: string(models.TagGeneral),
-		PeopleTag:  string(models.TagPeople),
+		MediaTypes: enum.MediaType("").Values(),
+		GeneralTag: string(enum.TagGeneral),
+		PeopleTag:  string(enum.TagPeople),
 		TagList:    tagList,
 		PeopleList: peopleList,
 	})
@@ -98,7 +99,7 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post := &posts.Post{Title: title, MediaType: models.MediaType(fileMedia), Filename: header.Filename, Tags: tags}
+	post := &posts.Post{Title: title, MediaType: enum.MediaType(fileMedia), Filename: header.Filename, Tags: tags}
 	err = h.postSvc.AddPost(r.Context(), post, file, userID)
 	if err != nil {
 		http.Error(w, "Failed to add post", http.StatusInternalServerError)
@@ -115,17 +116,18 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	paths := make([]ResponseEntry, len(posts))
+	content := make([]ResponseEntry, len(posts))
 	for i := range posts {
-		paths[i] = ResponseEntry{
-			Path: path.Join(posts[i].Filename[0:2], posts[i].Filename[2:4], posts[i].Filename),
-			ID:   posts[i].ID,
+		content[i] = ResponseEntry{
+			Filename: posts[i].Filename,
+			FileExt:  constant.ThumbnailExt,
+			ID:       posts[i].ID,
 		}
 	}
 
 	isUser := false
 	userID, ok := middleware.GetUserID(r)
-	if ok && userID != -1 {
+	if ok && userID != 0 {
 		isUser = true
 	}
 
@@ -133,7 +135,7 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 		Posts  []ResponseEntry
 		IsUser bool
 	}{
-		Posts:  paths,
+		Posts:  content,
 		IsUser: isUser,
 	})
 	if err != nil {
@@ -151,7 +153,7 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 
 	isUser := false
 	userID, ok := middleware.GetUserID(r)
-	if ok && userID != -1 {
+	if ok && userID != 0 {
 		isUser = true
 	}
 
@@ -171,22 +173,28 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := path.Join(post.Filename[0:2], post.Filename[2:4], post.Filename)
-
 	err = h.tmpl.ExecuteTemplate(w, "view.html", struct {
-		Path   string
-		ID     int
-		IsUser bool
-		IsFav  bool
-		People []tags.Tag
-		Tags   []tags.Tag
+		Filename  string
+		FileExt   string
+		ID        int
+		IsUser    bool
+		IsFav     bool
+		People    []tags.Tag
+		Tags      []tags.Tag
+		Type      string
+		TypeImage string
+		TypeVideo string
 	}{
-		Path:   path,
-		ID:     postID,
-		IsUser: isUser,
-		IsFav:  isFav,
-		People: tagMap[models.TagPeople],
-		Tags:   tagMap[models.TagGeneral],
+		Filename:  post.Filename,
+		FileExt:   post.FileExt[1:],
+		ID:        postID,
+		IsUser:    isUser,
+		IsFav:     isFav,
+		People:    tagMap[enum.TagPeople],
+		Tags:      tagMap[enum.TagGeneral],
+		Type:      string(post.MediaType),
+		TypeImage: string(enum.MediaImage),
+		TypeVideo: string(enum.MediaVideo),
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -206,16 +214,17 @@ func (h *PostHandler) ListUserPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	paths := make([]ResponseEntry, len(posts))
+	content := make([]ResponseEntry, len(posts))
 	for i := range posts {
-		paths[i] = ResponseEntry{
-			Path: path.Join(posts[i].Filename[0:2], posts[i].Filename[2:4], posts[i].Filename),
-			ID:   posts[i].ID,
+		content[i] = ResponseEntry{
+			Filename: posts[i].Filename,
+			FileExt:  constant.ThumbnailExt,
+			ID:       posts[i].ID,
 		}
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "uploads.html", struct{ Posts []ResponseEntry }{
-		Posts: paths,
+		Posts: content,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -235,16 +244,17 @@ func (h *PostHandler) ListUserFavs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	paths := make([]ResponseEntry, len(posts))
+	content := make([]ResponseEntry, len(posts))
 	for i := range posts {
-		paths[i] = ResponseEntry{
-			Path: path.Join(posts[i].Filename[0:2], posts[i].Filename[2:4], posts[i].Filename),
-			ID:   posts[i].ID,
+		content[i] = ResponseEntry{
+			Filename: posts[i].Filename,
+			FileExt:  constant.ThumbnailExt,
+			ID:       posts[i].ID,
 		}
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "favourites.html", struct{ Posts []ResponseEntry }{
-		Posts: paths,
+		Posts: content,
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -259,13 +269,13 @@ func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filepath, ok := middleware.GetFilepath(r)
+	filename, fileExt, ok := middleware.GetCompleteFilename(r)
 	if !ok {
-		http.Error(w, "Error reading filepath", http.StatusInternalServerError)
+		http.Error(w, "Error reading filename", http.StatusInternalServerError)
 		return
 	}
 
-	err := h.postSvc.DeletePost(r.Context(), postID, filepath)
+	err := h.postSvc.DeletePost(r.Context(), postID, filename, fileExt)
 	if err != nil {
 		http.Error(w, "Error deleting post", http.StatusInternalServerError)
 		return

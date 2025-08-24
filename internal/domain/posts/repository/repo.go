@@ -7,7 +7,7 @@ import (
 	entUser "goserv/ent/gen/user"
 	"goserv/internal/domain/posts"
 	"goserv/internal/domain/tags"
-	"goserv/internal/models"
+	"goserv/internal/static/enum"
 	"goserv/internal/utils/errors"
 )
 
@@ -42,6 +42,7 @@ func (repo *postRepository) AddPost(ctx context.Context, post *posts.Post, userI
 		SetTitle(post.Title).
 		SetMediaType(entPost.MediaType(post.MediaType)).
 		SetFilename(post.Filename).
+		SetFileExt(post.FileExt).
 		SetOwnerID(userID).
 		AddTagIDs(tagIDs...).
 		Save(ctx)
@@ -69,7 +70,7 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 	for i := range post.Edges.Tags {
 		domainTags[i] = tags.Tag{
 			ID:   post.Edges.Tags[i].ID,
-			Type: models.TagType(post.Edges.Tags[i].TagType),
+			Type: enum.TagType(post.Edges.Tags[i].TagType),
 			Name: post.Edges.Tags[i].Name,
 		}
 	}
@@ -77,8 +78,9 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 	result := &posts.Post{
 		ID:        post.ID,
 		Title:     post.Title,
-		MediaType: models.MediaType(post.MediaType),
+		MediaType: enum.MediaType(post.MediaType),
 		Filename:  post.Filename,
+		FileExt:   post.FileExt,
 		OwnerID:   post.UserOwns,
 
 		Tags: domainTags,
@@ -96,8 +98,9 @@ func (repo *postRepository) ListPosts(ctx context.Context) ([]posts.Post, error)
 		returnPosts[i] = posts.Post{
 			ID:        entPosts[i].ID,
 			Title:     entPosts[i].Title,
-			MediaType: models.MediaType(entPosts[i].MediaType),
+			MediaType: enum.MediaType(entPosts[i].MediaType),
 			Filename:  entPosts[i].Filename,
+			FileExt:   entPosts[i].FileExt,
 		}
 	}
 	return returnPosts, err
@@ -110,8 +113,9 @@ func (repo *postRepository) ListUserPosts(ctx context.Context, userID int) ([]po
 		returnPosts[i] = posts.Post{
 			ID:        entPosts[i].ID,
 			Title:     entPosts[i].Title,
-			MediaType: models.MediaType(entPosts[i].MediaType),
+			MediaType: enum.MediaType(entPosts[i].MediaType),
 			Filename:  entPosts[i].Filename,
+			FileExt:   entPosts[i].FileExt,
 		}
 	}
 	return returnPosts, err
@@ -124,8 +128,9 @@ func (repo *postRepository) ListUserFavs(ctx context.Context, userID int) ([]pos
 		returnPosts[i] = posts.Post{
 			ID:        entPosts[i].ID,
 			Title:     entPosts[i].Title,
-			MediaType: models.MediaType(entPosts[i].MediaType),
+			MediaType: enum.MediaType(entPosts[i].MediaType),
 			Filename:  entPosts[i].Filename,
+			FileExt:   entPosts[i].FileExt,
 		}
 	}
 	return returnPosts, err
@@ -159,7 +164,7 @@ func (repo *postRepository) GetPostWithFavourite(ctx context.Context, postID int
 	for i := range post.Edges.Tags {
 		domainTags[i] = tags.Tag{
 			ID:   post.Edges.Tags[i].ID,
-			Type: models.TagType(post.Edges.Tags[i].TagType),
+			Type: enum.TagType(post.Edges.Tags[i].TagType),
 			Name: post.Edges.Tags[i].Name,
 		}
 	}
@@ -167,8 +172,9 @@ func (repo *postRepository) GetPostWithFavourite(ctx context.Context, postID int
 	result := &posts.Post{
 		ID:        post.ID,
 		Title:     post.Title,
-		MediaType: models.MediaType(post.MediaType),
+		MediaType: enum.MediaType(post.MediaType),
 		Filename:  post.Filename,
+		FileExt:   post.FileExt,
 		OwnerID:   post.UserOwns,
 
 		Tags: domainTags,

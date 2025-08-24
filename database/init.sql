@@ -16,6 +16,7 @@ CREATE TABLE "posts" (
   "title" character varying NOT NULL,
   "media_type" media_type NOT NULL,
   "filename" character varying NOT NULL,
+  "file_ext" character varying NOT NULL,
   "user_owns" bigint NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "posts_users_owns" FOREIGN KEY ("user_owns") REFERENCES "users" ("id") ON DELETE SET NULL

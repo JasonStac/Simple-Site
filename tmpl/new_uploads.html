@@ -84,7 +84,7 @@
       grid.innerHTML = '';
       posts.forEach(post => {
         const img = document.createElement('img');
-        img.src = `/assets/images/${post.filename}`;
+        img.src = `/assets/content/${post.filename}`;
         img.alt = post.title;
         grid.appendChild(img);
       });

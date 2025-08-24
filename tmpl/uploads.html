@@ -28,7 +28,7 @@
     {{range .Posts}}
       <div class="image-box">
         <a href="/view/posts/{{.ID}}">
-          <img src="/assets/images/{{.Path}}" alt="Image">
+          <img src="/assets/thumbnail/{{.Filename}}{{.FileExt}}" alt="Image">
         </a>
         <button onclick="sendPost('{{.ID}}', this)" class="btn delete">Delete</button>
       </div>

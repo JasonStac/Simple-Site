@@ -39,7 +39,7 @@
       <p style="color: white;">
         <b>Tags:</b>
         {{range .Tags}}
-        {{.Name}} <!--TODO: add bubble styles around each name-->
+          {{.Name}} <!--TODO: add bubble styles around each name-->
         {{end}}
       </p>
     </div>
@@ -53,9 +53,16 @@
             <button onclick="favouritePost('{{.ID}}', this)" class="btn favourite" data-fav="false">Favourite</button>
           {{end}}
         {{end}}
-        <a href="/assets/images/{{.Path}}" class="btn download" download>Download</a>
+        <a href="/assets/content/{{.Filename}}.{{.FileExt}}" class="btn download" download>Download</a>
       </div>
-      <img style="max-width: 1000px; max-height: 750px" src="/assets/images/{{.Path}}" alt="Image"> <!--TODO: update when multiple content types implemented-->
+      {{if eq .Type .TypeImage}}
+        <img style="max-width: 1000px; max-height: 750px" src="/assets/content/{{.Filename}}.{{.FileExt}}" alt="Image">
+      {{else if eq .Type .TypeVideo}}
+        <video style="max-width: 750px; max-height: 500px" controls>
+          <source src="/assets/content/{{.Filename}}.{{.FileExt}}" type="video/{{.FileExt}}">
+          Your browser does not suppor the video tag.
+        </video>
+      {{end}}
     </div>
     </div>
   </section>
