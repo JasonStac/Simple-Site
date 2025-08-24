@@ -128,7 +128,7 @@ func (s *PostService) DeletePost(ctx context.Context, postID int, filename strin
 		log.Printf("Failed to remove content file during delete for data: %s, %v\n", dataPath, err)
 	}
 
-	err = os.Remove(filepath.Join("thumbnail", dataPath+constant.ThumbnailExt))
+	err = os.Remove(filepath.Join("thumbnails", dataPath+constant.ThumbnailExt))
 	if err != nil {
 		log.Printf("Failed to remove thumbnail file during delete for data: %s, %v\n", dataPath, err)
 	}

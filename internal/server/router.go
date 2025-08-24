@@ -75,7 +75,7 @@ func (s *Server) initRoutes(
 	s.router.Mount("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
 	//s.router.Mount("/assets/content/", http.StripPrefix("/assets/content/", http.FileServer(http.Dir("content"))))
 	s.router.Mount("/assets/content/", routeContentServe())
-	s.router.Mount("/assets/thumbnail/", routeThumbnailServe())
+	s.router.Mount("/assets/thumbnails/", routeThumbnailServe())
 
 	s.router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("404 Not Found: %s\n", r.URL.Path)
@@ -122,7 +122,7 @@ func routeThumbnailServe() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			filename, ok := strings.CutPrefix(r.URL.Path, "/assets/thumbnail/")
+			filename, ok := strings.CutPrefix(r.URL.Path, "/assets/thumbnails/")
 			if !ok {
 				http.Error(w, "bad prefix", http.StatusNotFound)
 				return
@@ -135,7 +135,7 @@ func routeThumbnailServe() http.HandlerFunc {
 
 			title := filename[fileHashLen:]
 			w.Header().Set("Content-Disposition", "attachment; filename="+title)
-			http.ServeFile(w, r, filepath.Join("thumbnail", filename[0:2], filename[2:4], filename))
+			http.ServeFile(w, r, filepath.Join("thumbnails", filename[0:2], filename[2:4], filename))
 		default:
 			http.Error(w, "bad method", http.StatusMethodNotAllowed)
 		}

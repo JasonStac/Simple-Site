@@ -21,7 +21,7 @@ func CreateImageThumbnail(dir string, filename string, fileExt string) error {
 		return err
 	}
 
-	thumbnailDir := filepath.Join("thumbnail", filename[0:2], filename[2:4])
+	thumbnailDir := filepath.Join("thumbnails", filename[0:2], filename[2:4])
 	if err := os.MkdirAll(thumbnailDir, 0755); err != nil {
 		log.Printf("failed to create thumbnail dir: %v\n", err)
 		return err
