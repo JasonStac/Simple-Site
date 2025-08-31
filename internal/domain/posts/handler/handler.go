@@ -157,7 +157,7 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 		isUser = true
 	}
 
-	post, isFav, err := h.postSvc.GetPostWithFavourite(r.Context(), postID, userID)
+	post, isFav, err := h.postSvc.GetPostWithFavouriteStatus(r.Context(), postID, userID)
 	if err != nil {
 		if errors.Is(err, myErrors.ErrNotFound) {
 			http.NotFound(w, r)

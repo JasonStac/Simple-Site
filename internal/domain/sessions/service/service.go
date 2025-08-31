@@ -7,21 +7,21 @@ import (
 	"errors"
 	"goserv/internal/domain/sessions"
 	"goserv/internal/domain/sessions/repository"
-	"goserv/internal/domain/users/service"
+	uRepo "goserv/internal/domain/users/repository"
 )
 
 type SessionService struct {
-	repo    repository.Session
-	userSvc *service.UserService
+	repo     repository.Session
+	userRepo uRepo.User
 }
 
-func NewSessionService(repo repository.Session, userSvc *service.UserService) *SessionService {
-	return &SessionService{repo: repo, userSvc: userSvc}
+func NewSessionService(repo repository.Session, userRepo uRepo.User) *SessionService {
+	return &SessionService{repo: repo, userRepo: userRepo}
 }
 
 func (s *SessionService) Login(ctx context.Context, username string, password string) (string, error) {
-	user, ok, err := s.userSvc.CheckPassword(ctx, username, password)
-	if err != nil || !ok {
+	user, isMatch, err := s.userRepo.CheckPassword(ctx, username, password)
+	if err != nil || !isMatch {
 		return "", errors.New("invalid credentials")
 	}
 

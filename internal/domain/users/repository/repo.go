@@ -46,7 +46,7 @@ func (repo *userRepository) CheckPassword(ctx context.Context, username string, 
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PassHash), []byte(password))
 	if err != nil {
-		return nil, false, err
+		return nil, false, nil
 	}
 	return &users.User{ID: user.ID, Username: user.Username, IsAdmin: user.IsAdmin}, true, nil
 }

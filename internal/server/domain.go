@@ -43,7 +43,7 @@ func (s *Server) initAuth() (*userHandler.UserHandler, *sessionHandler.SessionHa
 	s.user = userRepo
 
 	sessionRepo := sessionRepo.NewSessionRepository(s.ent)
-	sessionService := sessionService.NewSessionService(sessionRepo, userService)
+	sessionService := sessionService.NewSessionService(sessionRepo, userRepo)
 	sessionHandler := sessionHandler.NewSessionHandler(sessionService, s.tmplCache)
 	s.session = sessionRepo
 

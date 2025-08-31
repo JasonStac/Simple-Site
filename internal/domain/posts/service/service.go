@@ -143,10 +143,10 @@ func (s *PostService) UnfavouritePost(ctx context.Context, postID int, userID in
 	return s.repo.UnfavouritePost(ctx, postID, userID)
 }
 
-func (s *PostService) GetPostWithFavourite(ctx context.Context, postID int, userID int) (*posts.Post, bool, error) {
+func (s *PostService) GetPostWithFavouriteStatus(ctx context.Context, postID int, userID int) (*posts.Post, bool, error) {
 	if userID == 0 {
 		post, err := s.repo.GetPost(ctx, postID)
 		return post, false, err
 	}
-	return s.repo.GetPostWithFavourite(ctx, postID, userID)
+	return s.repo.GetPostWithFavouriteStatus(ctx, postID, userID)
 }

@@ -20,7 +20,7 @@ type Post interface {
 	ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error)
 	FavouritePost(ctx context.Context, postID int, userID int) error
 	UnfavouritePost(ctx context.Context, postID int, userID int) error
-	GetPostWithFavourite(ctx context.Context, postID int, userID int) (*posts.Post, bool, error)
+	GetPostWithFavouriteStatus(ctx context.Context, postID int, userID int) (*posts.Post, bool, error)
 }
 
 type postRepository struct {
@@ -144,7 +144,7 @@ func (repo *postRepository) UnfavouritePost(ctx context.Context, postID int, use
 	return repo.client.User.UpdateOneID(userID).RemoveFavouriteIDs(postID).Exec(ctx)
 }
 
-func (repo *postRepository) GetPostWithFavourite(ctx context.Context, postID int, userID int) (*posts.Post, bool, error) {
+func (repo *postRepository) GetPostWithFavouriteStatus(ctx context.Context, postID int, userID int) (*posts.Post, bool, error) {
 	post, err := repo.client.Post.
 		Query().
 		Where(entPost.IDEQ(postID)).
