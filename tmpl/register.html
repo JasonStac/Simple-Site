@@ -20,9 +20,9 @@
   <label>Already have an account? <a href="/login">Login</a> here!</label>
 
   <script>
-    const form = document.getElementById("registerForm")
+    const form = document.getElementById("registerForm");
     const errorDisplay = document.getElementById("error");
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", function(e) {
       errorDisplay.textContent = "";
       const password1 = document.getElementById("password").value;
       const password2 = document.getElementById("password2").value;

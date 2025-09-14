@@ -10,6 +10,7 @@ import (
 	"goserv/internal/static/constant"
 	"goserv/internal/static/enum"
 	myErrors "goserv/internal/utils/errors"
+	"goserv/internal/utils/validate"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -59,12 +60,24 @@ func (h *PostHandler) ViewAddPost(w http.ResponseWriter, r *http.Request) {
 		PeopleTag  string
 		TagList    []tags.Tag
 		PeopleList []tags.Tag
+		TypeImage  string
+		TypeVideo  string
+		TypeAudio  string
+		ImageExts  []string
+		VideoExts  []string
+		AudioExts  []string
 	}{
 		MediaTypes: enum.MediaType("").Values(),
 		GeneralTag: string(enum.TagGeneral),
 		PeopleTag:  string(enum.TagPeople),
 		TagList:    tagList,
 		PeopleList: peopleList,
+		TypeImage:  string(enum.MediaImage),
+		TypeVideo:  string(enum.MediaVideo),
+		TypeAudio:  string(enum.MediaAudio),
+		ImageExts:  constant.GetImageExts(),
+		VideoExts:  constant.GetVideoExts(),
+		AudioExts:  constant.GetAudioExts(),
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -92,6 +105,11 @@ func (h *PostHandler) AddPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
+	if !validate.IsValidFileType(header.Filename, enum.MediaType(fileMedia)) {
+		http.Error(w, "Invalid file extension uploaded", http.StatusBadRequest)
+		return
+	}
 
 	tags, ok := middleware.GetTags(r)
 	if !ok {
