@@ -108,6 +108,14 @@ func (s *PostService) ListPosts(ctx context.Context) ([]posts.Post, error) {
 	return s.repo.ListPosts(ctx)
 }
 
+func (s *PostService) ListPostsByGeneralTag(ctx context.Context, tagName string) ([]posts.Post, error) {
+	return s.repo.ListPostsByGeneralTag(ctx, tagName)
+}
+
+func (s *PostService) ListPostsByPeopleTag(ctx context.Context, tagName string) ([]posts.Post, error) {
+	return s.repo.ListPostsByPeopleTag(ctx, tagName)
+}
+
 func (s *PostService) ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error) {
 	return s.repo.ListUserPosts(ctx, userID)
 }

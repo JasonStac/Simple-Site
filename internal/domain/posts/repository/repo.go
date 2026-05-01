@@ -4,6 +4,7 @@ import (
 	"context"
 	"goserv/ent/gen"
 	entPost "goserv/ent/gen/post"
+	entTag "goserv/ent/gen/tag"
 	entUser "goserv/ent/gen/user"
 	"goserv/internal/domain/posts"
 	"goserv/internal/domain/tags"
@@ -16,6 +17,8 @@ type Post interface {
 	DeletePost(ctx context.Context, postID int) error
 	GetPost(ctx context.Context, postID int) (*posts.Post, error)
 	ListPosts(ctx context.Context) ([]posts.Post, error)
+	ListPostsByGeneralTag(ctx context.Context, tagName string) ([]posts.Post, error)
+	ListPostsByPeopleTag(ctx context.Context, tagName string) ([]posts.Post, error)
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
 	ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error)
 	FavouritePost(ctx context.Context, postID int, userID int) error
@@ -90,6 +93,42 @@ func (repo *postRepository) GetPost(ctx context.Context, postID int) (*posts.Pos
 
 func (repo *postRepository) ListPosts(ctx context.Context) ([]posts.Post, error) {
 	entPosts, err := repo.client.Post.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	returnPosts := make([]posts.Post, len(entPosts))
+	for i := range entPosts {
+		returnPosts[i] = posts.Post{
+			ID:        entPosts[i].ID,
+			Title:     entPosts[i].Title,
+			MediaType: enum.MediaType(entPosts[i].MediaType),
+			Filename:  entPosts[i].Filename,
+			FileExt:   entPosts[i].FileExt,
+		}
+	}
+	return returnPosts, err
+}
+
+func (repo *postRepository) ListPostsByGeneralTag(ctx context.Context, tagName string) ([]posts.Post, error) {
+	entPosts, err := repo.client.Post.Query().Where(entPost.HasTagsWith(entTag.NameEQ(tagName), entTag.TagTypeEQ(entTag.TagTypeGeneral))).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	returnPosts := make([]posts.Post, len(entPosts))
+	for i := range entPosts {
+		returnPosts[i] = posts.Post{
+			ID:        entPosts[i].ID,
+			Title:     entPosts[i].Title,
+			MediaType: enum.MediaType(entPosts[i].MediaType),
+			Filename:  entPosts[i].Filename,
+			FileExt:   entPosts[i].FileExt,
+		}
+	}
+	return returnPosts, err
+}
+
+func (repo *postRepository) ListPostsByPeopleTag(ctx context.Context, tagName string) ([]posts.Post, error) {
+	entPosts, err := repo.client.Post.Query().Where(entPost.HasTagsWith(entTag.NameEQ(tagName), entTag.TagTypeEQ(entTag.TagTypePeople))).All(ctx)
 	if err != nil {
 		return nil, err
 	}

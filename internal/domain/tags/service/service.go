@@ -28,6 +28,10 @@ func (s *TagService) ListGeneralTags(ctx context.Context) ([]tags.Tag, error) {
 	return s.repo.ListGeneralTags(ctx)
 }
 
+func (s *TagService) GetTagByName(ctx context.Context, name string, tagType enum.TagType) (*tags.Tag, error) {
+	return s.repo.GetTagByName(ctx, name, tagType)
+}
+
 func (s *TagService) ListPeopleTags(ctx context.Context) ([]tags.Tag, error) {
 	return s.repo.ListPeopleTags(ctx)
 }

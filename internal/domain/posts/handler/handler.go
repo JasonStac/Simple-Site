@@ -162,6 +162,102 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *PostHandler) ListPostsByGeneralTag(w http.ResponseWriter, r *http.Request) {
+	tagName := strings.TrimPrefix(r.URL.Path, "/view/tags/")
+	if tagName == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Check if tag exists first to return 404 if not found
+	_, err := h.tagSvc.GetTagByName(r.Context(), tagName, enum.TagGeneral)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	posts, err := h.postSvc.ListPostsByGeneralTag(r.Context(), tagName)
+	if err != nil {
+		http.Error(w, "Error listing posts", http.StatusInternalServerError)
+		return
+	}
+
+	content := make([]ResponseEntry, len(posts))
+	for i := range posts {
+		content[i] = ResponseEntry{
+			Filename: posts[i].Filename,
+			FileExt:  constant.ThumbnailExt,
+			ID:       posts[i].ID,
+		}
+	}
+
+	isUser := false
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != 0 {
+		isUser = true
+	}
+
+	err = h.tmpl.ExecuteTemplate(w, "list.html", struct {
+		Posts  []ResponseEntry
+		IsUser bool
+	}{
+		Posts:  content,
+		IsUser: isUser,
+	})
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *PostHandler) ListPostsByPeopleTag(w http.ResponseWriter, r *http.Request) {
+	tagName := strings.TrimPrefix(r.URL.Path, "/view/tags/")
+	if tagName == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Check if tag exists first to return 404 if not found
+	_, err := h.tagSvc.GetTagByName(r.Context(), tagName, enum.TagPeople)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	posts, err := h.postSvc.ListPostsByPeopleTag(r.Context(), tagName)
+	if err != nil {
+		http.Error(w, "Error listing posts", http.StatusInternalServerError)
+		return
+	}
+
+	content := make([]ResponseEntry, len(posts))
+	for i := range posts {
+		content[i] = ResponseEntry{
+			Filename: posts[i].Filename,
+			FileExt:  constant.ThumbnailExt,
+			ID:       posts[i].ID,
+		}
+	}
+
+	isUser := false
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != 0 {
+		isUser = true
+	}
+
+	err = h.tmpl.ExecuteTemplate(w, "list.html", struct {
+		Posts  []ResponseEntry
+		IsUser bool
+	}{
+		Posts:  content,
+		IsUser: isUser,
+	})
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 	postID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/view/posts/"))
 	if err != nil {

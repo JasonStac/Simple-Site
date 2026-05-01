@@ -13,6 +13,7 @@ type Tag interface {
 	ListTags(ctx context.Context) ([]tags.Tag, error)
 	ListGeneralTags(ctx context.Context) ([]tags.Tag, error)
 	ListPeopleTags(ctx context.Context) ([]tags.Tag, error)
+	GetTagByName(ctx context.Context, name string, tagType enum.TagType) (*tags.Tag, error)
 }
 
 type tagRepository struct {
@@ -74,4 +75,16 @@ func (repo *tagRepository) ListPeopleTags(ctx context.Context) ([]tags.Tag, erro
 		}
 	}
 	return returnTags, err
+}
+
+func (repo *tagRepository) GetTagByName(ctx context.Context, name string, tagType enum.TagType) (*tags.Tag, error) {
+	entTag, err := repo.client.Tag.Query().Where(entTag.And(entTag.NameEQ(name), entTag.TagTypeEQ(entTag.TagType(tagType)))).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &tags.Tag{
+		ID:   entTag.ID,
+		Type: enum.TagType(entTag.TagType),
+		Name: entTag.Name,
+	}, nil
 }
