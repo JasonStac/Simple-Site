@@ -116,6 +116,33 @@ func (s *PostService) ListPostsByPeopleTag(ctx context.Context, tagName string) 
 	return s.repo.ListPostsByPeopleTag(ctx, tagName)
 }
 
+func (s *PostService) ListSearchedPosts(ctx context.Context, query string) ([]posts.Post, error) {
+	// If query has no colons, treat it as a simple title search
+	if !strings.Contains(query, ":") {
+		return s.repo.ListTitleSearchPosts(ctx, query)
+	}
+
+	// If query has single colon and no spaces, treat it as a simple single tag search
+	if strings.Count(query, ":") == 1 && !strings.Contains(query, " ") {
+		parts := strings.SplitN(query, ":", 2)
+		tagType := parts[0]
+		tagName := parts[1]
+
+		switch tagType {
+		case "tag":
+			return s.ListPostsByGeneralTag(ctx, tagName)
+		case "person":
+			return s.ListPostsByPeopleTag(ctx, tagName)
+		default:
+			return nil, errors.New("invalid tag type")
+		}
+	}
+
+	// TODO: implement elasticsearch query
+	// Handle complex queries with multiple search fields
+	return make([]posts.Post, 0), nil
+}
+
 func (s *PostService) ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error) {
 	return s.repo.ListUserPosts(ctx, userID)
 }

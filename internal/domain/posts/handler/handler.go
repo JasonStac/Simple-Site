@@ -211,7 +211,7 @@ func (h *PostHandler) ListPostsByGeneralTag(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *PostHandler) ListPostsByPeopleTag(w http.ResponseWriter, r *http.Request) {
-	tagName := strings.TrimPrefix(r.URL.Path, "/view/tags/")
+	tagName := strings.TrimPrefix(r.URL.Path, "/view/people/")
 	if tagName == "" {
 		http.NotFound(w, r)
 		return
@@ -225,6 +225,47 @@ func (h *PostHandler) ListPostsByPeopleTag(w http.ResponseWriter, r *http.Reques
 	}
 
 	posts, err := h.postSvc.ListPostsByPeopleTag(r.Context(), tagName)
+	if err != nil {
+		http.Error(w, "Error listing posts", http.StatusInternalServerError)
+		return
+	}
+
+	content := make([]ResponseEntry, len(posts))
+	for i := range posts {
+		content[i] = ResponseEntry{
+			Filename: posts[i].Filename,
+			FileExt:  constant.ThumbnailExt,
+			ID:       posts[i].ID,
+		}
+	}
+
+	isUser := false
+	userID, ok := middleware.GetUserID(r)
+	if ok && userID != 0 {
+		isUser = true
+	}
+
+	err = h.tmpl.ExecuteTemplate(w, "list.html", struct {
+		Posts  []ResponseEntry
+		IsUser bool
+	}{
+		Posts:  content,
+		IsUser: isUser,
+	})
+	if err != nil {
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *PostHandler) ListSearchedPosts(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		http.Error(w, "Missing search query", http.StatusBadRequest)
+		return
+	}
+
+	posts, err := h.postSvc.ListSearchedPosts(r.Context(), query)
 	if err != nil {
 		http.Error(w, "Error listing posts", http.StatusInternalServerError)
 		return
@@ -291,6 +332,7 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 		Filename  string
 		FileExt   string
 		ID        int
+		Title     string
 		IsUser    bool
 		IsFav     bool
 		People    []tags.Tag
@@ -302,6 +344,7 @@ func (h *PostHandler) ViewPost(w http.ResponseWriter, r *http.Request) {
 		Filename:  post.Filename,
 		FileExt:   post.FileExt[1:],
 		ID:        postID,
+		Title:     post.Title,
 		IsUser:    isUser,
 		IsFav:     isFav,
 		People:    tagMap[enum.TagPeople],

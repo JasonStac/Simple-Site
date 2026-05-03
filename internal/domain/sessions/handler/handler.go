@@ -38,6 +38,7 @@ func (h *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
+	// Update this to differentiate between invalid credentials and internal errors
 	sessionID, err := h.svc.Login(r.Context(), username, password)
 	if err != nil {
 		http.Error(w, "Error logging in", http.StatusInternalServerError)

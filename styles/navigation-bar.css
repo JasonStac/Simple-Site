@@ -33,3 +33,30 @@ html, body {
   background-color: #04AA6D;
   color: white;
 }
+
+.searchbar {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.searchbar input {
+  padding: 13px;
+  border: none;
+  border-radius: 3px 0 0 3px;
+  outline: none;
+  width: 300px;
+}
+
+.searchbar button {
+  padding: 12px;
+  border: none;
+  background-color: #04AA6D;
+  color: white;
+  cursor: pointer;
+  border-radius: 0 3px 3px 0;
+}
+
+.searchbar button:hover {
+  background-color: #60db8d;
+}

@@ -58,7 +58,10 @@ func (s *Server) initRoutes(
 		r.Get("/tags", tagHandler.ListGeneralTags)
 		r.Mount("/tags/", routeSingleGeneralTag(postHandler))
 		r.Get("/people", tagHandler.ListPeopleTags)
+		r.Mount("/people/", routeSinglePeopleTag(postHandler))
 	})
+
+	s.router.With(authMiddleware).Get("/search", postHandler.ListSearchedPosts)
 
 	s.router.With(authMiddleware).Route("/profile", func(r chi.Router) {
 		r.Get("/", userHandler.Profile)
@@ -74,6 +77,7 @@ func (s *Server) initRoutes(
 	s.router.With(authMiddleware).Post("/unfavourite", postHandler.UnfavouritePost)
 
 	s.router.Mount("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
+	s.router.Mount("/scripts/", http.StripPrefix("/scripts/", http.FileServer(http.Dir("scripts"))))
 	s.router.Mount("/fav/", http.StripPrefix("/fav/", http.FileServer(http.Dir("fav"))))
 	//s.router.Mount("/assets/content/", http.StripPrefix("/assets/content/", http.FileServer(http.Dir("content"))))
 	s.router.Mount("/assets/content/", routeContentServe())
@@ -101,6 +105,17 @@ func routeSingleGeneralTag(postHandler *postHandler.PostHandler) http.HandlerFun
 		switch r.Method {
 		case http.MethodGet:
 			postHandler.ListPostsByGeneralTag(w, r)
+		default:
+			http.Error(w, "Unsupported status method", http.StatusMethodNotAllowed)
+		}
+	}
+}
+
+func routeSinglePeopleTag(postHandler *postHandler.PostHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			postHandler.ListPostsByPeopleTag(w, r)
 		default:
 			http.Error(w, "Unsupported status method", http.StatusMethodNotAllowed)
 		}

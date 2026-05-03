@@ -19,6 +19,7 @@ type Post interface {
 	ListPosts(ctx context.Context) ([]posts.Post, error)
 	ListPostsByGeneralTag(ctx context.Context, tagName string) ([]posts.Post, error)
 	ListPostsByPeopleTag(ctx context.Context, tagName string) ([]posts.Post, error)
+	ListTitleSearchPosts(ctx context.Context, searchTerm string) ([]posts.Post, error)
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
 	ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error)
 	FavouritePost(ctx context.Context, postID int, userID int) error
@@ -129,6 +130,24 @@ func (repo *postRepository) ListPostsByGeneralTag(ctx context.Context, tagName s
 
 func (repo *postRepository) ListPostsByPeopleTag(ctx context.Context, tagName string) ([]posts.Post, error) {
 	entPosts, err := repo.client.Post.Query().Where(entPost.HasTagsWith(entTag.NameEQ(tagName), entTag.TagTypeEQ(entTag.TagTypePeople))).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	returnPosts := make([]posts.Post, len(entPosts))
+	for i := range entPosts {
+		returnPosts[i] = posts.Post{
+			ID:        entPosts[i].ID,
+			Title:     entPosts[i].Title,
+			MediaType: enum.MediaType(entPosts[i].MediaType),
+			Filename:  entPosts[i].Filename,
+			FileExt:   entPosts[i].FileExt,
+		}
+	}
+	return returnPosts, err
+}
+
+func (repo *postRepository) ListTitleSearchPosts(ctx context.Context, searchTerm string) ([]posts.Post, error) {
+	entPosts, err := repo.client.Post.Query().Where(entPost.TitleContainsFold(searchTerm)).All(ctx)
 	if err != nil {
 		return nil, err
 	}

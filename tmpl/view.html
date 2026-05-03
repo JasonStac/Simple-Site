@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
   <link rel="manifest" href="/fav/site.webmanifest">
+  <script src="/scripts/favourite.js"></script>
   <title>Starting for image board</title>
 </head>
 
@@ -35,6 +36,7 @@
 
   <section>
     <div>
+      <p style="color: white;"><b>Title:</b> {{.Title}}</p>
       <p style="color: white;">
         <b>People:</b>
         {{range .People}}
@@ -65,37 +67,11 @@
       {{else if eq .Type .TypeVideo}}
         <video style="max-width: 750px; max-height: 500px" controls>
           <source src="/assets/content/{{.Filename}}.{{.FileExt}}" type="video/{{.FileExt}}">
-          Your browser does not suppor the video tag.
+          Your browser does not support the video tag.
         </video>
       {{end}}
     </div>
     </div>
   </section>
-  <script>
-    function favouritePost(value, btn) {
-      const isFav = btn.dataset.fav === "true";
-      const url = isFav ? "/favourite" : "/unfavourite";
-
-      const params = new URLSearchParams();
-      params.append("id", value);
-
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/x-www-form-urlencoded"
-        },
-        body: params.toString()
-      })
-      .then(res => {
-        if (res.ok) {
-          btn.textContent = isFav ? "Unfavourite" : "Favourite";
-          btn.dataset.fav = (!isFav).toString();
-        }
-      })
-      .catch(err => {
-        console.error("Error: ", err);
-      })
-    }
-  </script>
 </body>
 </html>

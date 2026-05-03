@@ -8,6 +8,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
   <link rel="manifest" href="/fav/site.webmanifest">
+  <script src="/scripts/searchVal.js"></script>
   <title>Starting for image board</title>
 </head>
 <body>
@@ -19,6 +20,10 @@
       <a href="/view/people">People</a>
     </div>
     <div class="right">
+      <form class="searchbar" action="/search" method="GET" onsubmit="return validateSearch(this)">
+        <input type="text" placeholder="Search..." name="q">
+        <button type="submit">🔍</button>
+      </form>
       {{if .IsUser}}
         <a href="/logout">Logout</a>
         <a href="/profile">Profile</a>
