@@ -23,18 +23,17 @@ Currently, I've used Go with [ent](https://github.com/ent/ent) + [chi](https://g
   - [x] Viewing favourited posts when logged in
   - [x] Favouriting posts
   - [x] Deleting uploads
+  - [x] Downloading posts
+  - [x] Simple title match searches
+  - [x] Single tag filtering searches
 
 # Planned Features
 Currently planned future features include:
   - Support for posts to contain audio, video, and book/compilation data
-  - The ability to download posts
   - The ability to update your own posts
   - Adding timeouts for sessions in both cookie and database
-  - The ability to filter posts by search on titles
-  - The ability to filter posts by search on tags
-  - The ability to filter posts by search on artists
-  - The ability to filter posts by search on a combination of titles, tags, and artists
-  - Add admin functionality to add/update/delete any post, tag, artist, or user
+  - The ability to filter posts by search on a combination of titles and tags
+  - Add admin functionality to add/update/delete any post, tag, or user
   - Add pagination to the post list view
   - Add a logger to the backend
   - Redis for caching
@@ -57,7 +56,11 @@ POST  /logout              /internal/domain/session/handler/handler@Logout
 GET   /view/posts          /internal/domain/post/handler/handler@ListPosts
 GET   /view/posts/{id}     /internal/domain/post/handler/handler@ViewPost
 GET   /view/tags           /internal/domain/tag/handler/handler@ListGeneralTags
+GET   /view/tags/{name}    /internal/domain/post/handler/handler@ListPostsByGeneralTag
 GET   /view/people         /internal/domain/tag/handler/handler@ListPeopleTags
+GET   /view/people/{name}  /internal/domain/post/handler/handler@ListPostsByPeopleTag
+
+GET   /search              /internal/domain/post/handler/handler@ListSearchedPosts
 
 GET   /profile             /internal/domain/user/handler/handler@Profile
 GET   /profile/create      /internal/domain/post/handelr/handler@ViewAddPost
