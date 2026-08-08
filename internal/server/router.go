@@ -61,7 +61,7 @@ func (s *Server) initRoutes(
 		r.Mount("/people/", routeSinglePeopleTag(postHandler))
 	})
 
-	s.router.With(authMiddleware).Get("/search", postHandler.ListSearchedPosts)
+	s.router.With(checkMiddleware).Get("/search", postHandler.ListSearchedPosts)
 
 	s.router.With(authMiddleware).Route("/profile", func(r chi.Router) {
 		r.Get("/", userHandler.Profile)
