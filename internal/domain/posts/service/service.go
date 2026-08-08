@@ -124,10 +124,9 @@ func (s *PostService) ListSearchedPosts(ctx context.Context, query string) ([]po
 
 	// If query has single colon and no spaces, treat it as a simple single tag search
 	if strings.Count(query, ":") == 1 && !strings.Contains(query, " ") {
-		parts := strings.SplitN(query, ":", 2)
-		tagType := parts[0]
-		tagName := parts[1]
+		tagType, tagName, _ := strings.Cut(query, ":")
 
+		tagName = strings.ReplaceAll(tagName, "_", " ")
 		switch tagType {
 		case "tag":
 			return s.ListPostsByGeneralTag(ctx, tagName)
@@ -138,9 +137,40 @@ func (s *PostService) ListSearchedPosts(ctx context.Context, query string) ([]po
 		}
 	}
 
-	// TODO: implement elasticsearch query
-	// Handle complex queries with multiple search fields
-	return make([]posts.Post, 0), nil
+	// TODO: implement elasticsearch query that handles complex queries with multiple search fields
+
+	tagNames := []string{}
+	tagTypes := []enum.TagType{}
+	searchTerms := []string{}
+	tagIncluded := []bool{}
+	searchFields := strings.Split(query, " ")
+	for _, field := range searchFields {
+		if strings.Count(field, ":") == 0 {
+			searchTerms = append(searchTerms, field)
+		} else {
+			tagType, tagName, _ := strings.Cut(field, ":")
+
+			tagName = strings.ReplaceAll(tagName, "_", " ")
+			tagNames = append(tagNames, tagName)
+
+			if tagType[0] == '-' {
+				tagIncluded = append(tagIncluded, false)
+				tagType = tagType[1:]
+			} else {
+				tagIncluded = append(tagIncluded, true)
+			}
+			switch tagType {
+			case "tag":
+				tagTypes = append(tagTypes, enum.TagGeneral)
+			case "person":
+				tagTypes = append(tagTypes, enum.TagPeople)
+			default:
+				return nil, errors.New("invalid tag type")
+			}
+		}
+	}
+
+	return s.repo.ListComplexQueryPosts(ctx, tagNames, tagTypes, tagIncluded, searchTerms)
 }
 
 func (s *PostService) ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error) {

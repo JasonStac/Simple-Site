@@ -20,6 +20,7 @@ type Post interface {
 	ListPostsByGeneralTag(ctx context.Context, tagName string) ([]posts.Post, error)
 	ListPostsByPeopleTag(ctx context.Context, tagName string) ([]posts.Post, error)
 	ListTitleSearchPosts(ctx context.Context, searchTerm string) ([]posts.Post, error)
+	ListComplexQueryPosts(ctx context.Context, tagNames []string, tagTypes []enum.TagType, tagIncluded []bool, searchTerms []string) ([]posts.Post, error)
 	ListUserPosts(ctx context.Context, userID int) ([]posts.Post, error)
 	ListUserFavs(ctx context.Context, userID int) ([]posts.Post, error)
 	FavouritePost(ctx context.Context, postID int, userID int) error
@@ -151,6 +152,50 @@ func (repo *postRepository) ListTitleSearchPosts(ctx context.Context, searchTerm
 	if err != nil {
 		return nil, err
 	}
+	returnPosts := make([]posts.Post, len(entPosts))
+	for i := range entPosts {
+		returnPosts[i] = posts.Post{
+			ID:        entPosts[i].ID,
+			Title:     entPosts[i].Title,
+			MediaType: enum.MediaType(entPosts[i].MediaType),
+			Filename:  entPosts[i].Filename,
+			FileExt:   entPosts[i].FileExt,
+		}
+	}
+	return returnPosts, err
+}
+
+func (repo *postRepository) ListComplexQueryPosts(ctx context.Context, tagNames []string, tagTypes []enum.TagType, tagIncluded []bool, searchTerms []string) ([]posts.Post, error) {
+	query := repo.client.Post.Query()
+
+	for i := range tagNames {
+		tagType := tagTypes[i]
+		tagName := tagNames[i]
+		included := tagIncluded[i]
+
+		if included {
+			switch tagType {
+			case enum.TagGeneral:
+				query = query.Where(entPost.HasTagsWith(entTag.NameEQ(tagName), entTag.TagTypeEQ(entTag.TagTypeGeneral)))
+			case enum.TagPeople:
+				query = query.Where(entPost.HasTagsWith(entTag.NameEQ(tagName), entTag.TagTypeEQ(entTag.TagTypePeople)))
+			default:
+				return nil, errors.ErrInvalidTagType
+			}
+		} else {
+			switch tagType {
+			case enum.TagGeneral:
+				query = query.Where(entPost.Not(entPost.HasTagsWith(entTag.NameEQ(tagName), entTag.TagTypeEQ(entTag.TagTypeGeneral))))
+			case enum.TagPeople:
+				query = query.Where(entPost.Not(entPost.HasTagsWith(entTag.NameEQ(tagName), entTag.TagTypeEQ(entTag.TagTypePeople))))
+			default:
+				return nil, errors.ErrInvalidTagType
+			}
+		}
+	}
+
+	entPosts, err := query.All(ctx)
+
 	returnPosts := make([]posts.Post, len(entPosts))
 	for i := range entPosts {
 		returnPosts[i] = posts.Post{

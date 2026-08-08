@@ -22,3 +22,4 @@ const (
 // }
 
 var ErrNotFound = errors.New(notFoundMessage)
+var ErrInvalidTagType = errors.New("invalid tag type")
