@@ -42,42 +42,42 @@ func NewPostHandler(
 }
 
 func (h *PostHandler) ViewAddPost(w http.ResponseWriter, r *http.Request) {
-	tagList, err := h.tagSvc.ListTags(r.Context())
+	generalTagList, err := h.tagSvc.ListGeneralTags(r.Context())
 	if err != nil {
-		http.Error(w, "Error getting tags", http.StatusInternalServerError)
+		http.Error(w, "Error getting general tags", http.StatusInternalServerError)
 		// intentionally let continue for now
 	}
 
-	peopleList, err := h.tagSvc.ListPeopleTags(r.Context())
+	peopleTagList, err := h.tagSvc.ListPeopleTags(r.Context())
 	if err != nil {
-		http.Error(w, "Error getting people", http.StatusInternalServerError)
+		http.Error(w, "Error getting people tags", http.StatusInternalServerError)
 		// intentionally let continue for now
 	}
 
 	err = h.tmpl.ExecuteTemplate(w, "add.html", struct {
-		MediaTypes []string
-		GeneralTag string
-		PeopleTag  string
-		TagList    []tags.Tag
-		PeopleList []tags.Tag
-		TypeImage  string
-		TypeVideo  string
-		TypeAudio  string
-		ImageExts  []string
-		VideoExts  []string
-		AudioExts  []string
+		MediaTypes  []string
+		GeneralTag  string
+		PeopleTag   string
+		GeneralList []tags.Tag
+		PeopleList  []tags.Tag
+		TypeImage   string
+		TypeVideo   string
+		TypeAudio   string
+		ImageExts   []string
+		VideoExts   []string
+		AudioExts   []string
 	}{
-		MediaTypes: enum.MediaType("").Values(),
-		GeneralTag: string(enum.TagGeneral),
-		PeopleTag:  string(enum.TagPeople),
-		TagList:    tagList,
-		PeopleList: peopleList,
-		TypeImage:  string(enum.MediaImage),
-		TypeVideo:  string(enum.MediaVideo),
-		TypeAudio:  string(enum.MediaAudio),
-		ImageExts:  constant.GetImageExts(),
-		VideoExts:  constant.GetVideoExts(),
-		AudioExts:  constant.GetAudioExts(),
+		MediaTypes:  enum.MediaType("").Values(),
+		GeneralTag:  string(enum.TagGeneral),
+		PeopleTag:   string(enum.TagPeople),
+		GeneralList: generalTagList,
+		PeopleList:  peopleTagList,
+		TypeImage:   string(enum.MediaImage),
+		TypeVideo:   string(enum.MediaVideo),
+		TypeAudio:   string(enum.MediaAudio),
+		ImageExts:   constant.GetImageExts(),
+		VideoExts:   constant.GetVideoExts(),
+		AudioExts:   constant.GetAudioExts(),
 	})
 	if err != nil {
 		http.Error(w, "Template error", http.StatusInternalServerError)
