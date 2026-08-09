@@ -1,6 +1,6 @@
 function favouritePost(value, btn) {
   const isFav = btn.dataset.fav === "true";
-  const url = isFav ? "/favourite" : "/unfavourite";
+  const url = isFav ? "/unfavourite" : "/favourite";
 
   const params = new URLSearchParams();
   params.append("id", value);
@@ -14,7 +14,7 @@ function favouritePost(value, btn) {
   })
   .then(res => {
     if (res.ok) {
-      btn.textContent = isFav ? "Unfavourite" : "Favourite";
+      btn.textContent = isFav ? "Favourite" : "Unfavourite";
       btn.dataset.fav = (!isFav).toString();
     }
   })
