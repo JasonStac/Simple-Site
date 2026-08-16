@@ -2,15 +2,34 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="/styles/navigation-bar.css">
   <link rel="shortcut icon" href="/fav/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png">
   <link rel="manifest" href="/fav/site.webmanifest">
+  <script src="/scripts/searchVal.js"></script>
   <title>Starting for image board</title>
 </head>
 
 <body>
+  <div class="topnav">
+    <div class="left">
+      <a href="/">Home</a>
+      <a href="/view/posts">View</a>
+      <a href="/view/tags">Tags</a>
+      <a href="/view/people">People</a>
+    </div>
+    <div class="right">
+      <form class="searchbar" action="/search" method="GET" onsubmit="return validateSearch(this)">
+        <input type="text" placeholder="Search..." name="q">
+        <button type="submit">🔍</button>
+      </form>
+      <a class="active" href="/login">Login</a>
+      <a href="/register">Register</a>
+    </div>
+  </div>
+
   <h1>Login</h1>
 
   <form action="/login" method="Post">
