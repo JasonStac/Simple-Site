@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="/styles/navigation-bar.css">
   <link rel="stylesheet" href="/styles/image-buttons.css">
+  <link rel="stylesheet" href="/styles/tag-bubbles.css">
   <link rel="shortcut icon" href="/fav/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
@@ -41,17 +42,18 @@
 
   <section>
     <div>
+      <!--TODO: make title text same size as tag text-->
       <p style="color: white;"><b>Title:</b> {{.Title}}</p>
       <p style="color: white;">
         <b>People:</b>
         {{range .People}}
-        {{.Name}} <!--TODO: add bubble styles around each name-->
+          <a href="/view/people/{{.Name}}" class="bubble-link">{{.Name}}</a>
         {{end}}
       </p>
       <p style="color: white;">
         <b>Tags:</b>
         {{range .Tags}}
-          {{.Name}} <!--TODO: add bubble styles around each name-->
+          <a href="/view/tags/{{.Name}}" class="bubble-link">{{.Name}}</a>
         {{end}}
       </p>
     </div>

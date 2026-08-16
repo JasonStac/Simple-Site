@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="/styles/navigation-bar.css">
+  <link rel="stylesheet" href="/styles/tag-bubbles.css">
   <link rel="shortcut icon" href="/fav/favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png">
@@ -11,7 +12,7 @@
   <script src="/scripts/searchVal.js"></script>
   <title>Starting for image board</title>
 </head>
-<body>
+<body style="background-color: black;">
   <div class="topnav">
     <div class="left">
       <a href="/">Home</a>
@@ -34,11 +35,11 @@
     </div>
   </div>
 
-  <h1>Tags</h1>
+  <h1 style="color: white;">Tags</h1>
 
   <div>
     {{range .Tags}}
-      <a href="/view/tags/{{.}}">{{.}}</a>
+      <a href="/view/tags/{{.}}" class="bubble-link">{{.}}</a>
     {{end}}
   </div>
 </body>
